@@ -1,11 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 
 const withMT = require("@material-tailwind/react/utils/withMT");
- 
-module.exports = withMT({
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+export default withMT({
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
-    extend: {},
+    extend: {
+      
+    },
+    fontFamily:{
+      poppins: [ 'Poppins', 'sans-serif']
+    }
   },
-  plugins: [],
-});
+  plugins: [require('@shrutibalasa/tailwind-grid-auto-fit'),],
+})
+

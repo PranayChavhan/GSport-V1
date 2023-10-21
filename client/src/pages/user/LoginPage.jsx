@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { getRequest, postRequest, patchRequest, deleteRequest } from '../../api/api';
+import React, { useState } from "react";
+import {
+  postRequest,
+} from "../../api/api";
 
 import {
   Card,
@@ -11,32 +13,99 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import Cookies from "universal-cookie";
+import jwt from "jwt-decode";
 
 const LoginPage = () => {
+  const cookie = new Cookies();
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const responseData = await getRequest('/users');
-        setData(responseData);
-      } catch (error) {
-        console.error('Error:', error);
-      }
+  function validateEmail(email) {
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    return emailRegex.test(email);
+  }
+
+  function validatePassword(password) {
+    // At least 8 characters, with at least one uppercase letter, one lowercase letter, one number, and one special character.
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  }
+
+  function handleSignIn() {
+    setEmailError("");
+    setPasswordError("");
+
+    if (!validateEmail(email)) {
+      setEmailError("Invalid email address");
     }
 
-    fetchData();
-  }, []);
+    if (!password) {
+      setPasswordError("Password is required");
+    } else if (!validatePassword(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters and include one uppercase letter, one lowercase letter, one number, and one special character"
+      );
+    }
 
+    if (!emailError && !passwordError) {
+      // Prepare the formData for your backend API.
+      const jsonData = {
+        email_id: email,
+        password: password,
+      };
 
-  console.log('====================================');
-  console.log(data);
-  console.log('====================================');
+      postRequest("/users/login", jsonData)
+        .then((data) => {
+          console.log("API response:", data);
+          const decoded = jwt(data.access_token);
+          cookie.set("jwt_auth_token", data.access_token, {
+            expires: new Date(decoded.exp * 1000),
+            path: "/",
+          });
+           // Save user data to localStorage
+          localStorage.setItem('userData', JSON.stringify(data.data));
+          toast.success("Operation was successful!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
 
-  const handleSignIn = () => {
-    navigate("/");
-  };
+          navigate("/public/home");
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 400) {
+            // Handle the specific 400 error with the "User with this email or phone already exists" message.
+            console.error("API error: Incorrect email or password");
+            toast.error("Incorrect email or password", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          } else {
+            // Handle other API errors
+            console.error("API error:", error);
+            // You can handle other errors or set an appropriate error state.
+          }
+        });
+    }
+  }
+
   return (
     <div>
       <section className="text-gray-400 bg-gray-900 body-font relative h-full">
@@ -79,7 +148,12 @@ const LoginPage = () => {
                     labelProps={{
                       className: "before:content-none after:content-none",
                     }}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
+                  {emailError && (
+                    <p className="text-red-500 text-[12px]">{emailError}</p>
+                  )}
 
                   <Typography
                     variant="h6"
@@ -96,7 +170,12 @@ const LoginPage = () => {
                     labelProps={{
                       className: "before:content-none after:content-none",
                     }}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
+                  {passwordError && (
+                    <p className="text-red-500 text-[12px]">{passwordError}</p>
+                  )}
                 </div>
                 <Checkbox
                   label={

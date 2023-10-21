@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { postRequest } from "../../api/api";
+
 import {
   Card,
   Input,
@@ -9,13 +11,125 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullNameError, setFullNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [mobileNumberError, setMobileNumberError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [checkboxError, setCheckboxError] = useState("");
 
-  const handleSignUp = () => {
-    navigate("/login");
-  };
+  function validateEmail(email) {
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    return emailRegex.test(email);
+  }
+
+  function validateMobileNumber(mobileNumber) {
+    const mobileRegex = /^[6-9]\d{9}$/;
+    return mobileRegex.test(mobileNumber);
+  }
+
+  function validatePassword(password) {
+    // At least 8 characters, with at least one uppercase letter, one lowercase letter, one number, and one special character.
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+  }
+
+  function handleSignUp() {
+    setFullNameError("");
+    setEmailError("");
+    setMobileNumberError("");
+    setPasswordError("");
+    setCheckboxError("");
+
+    if (!fullName) {
+      setFullNameError("Full Name is required");
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError("Invalid email address");
+    }
+
+    if (!validateMobileNumber(mobileNumber)) {
+      setMobileNumberError("Invalid mobile number");
+    }
+
+    if (!password) {
+      setPasswordError("Password is required");
+    } else if (!validatePassword(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters and include one uppercase letter, one lowercase letter, one number, and one special character"
+      );
+    }
+
+    if (!isCheckboxChecked) {
+      setCheckboxError("Please accept the terms and conditions.");
+    }
+
+    if (
+      !fullNameError &&
+      !emailError &&
+      !mobileNumberError &&
+      !passwordError &&
+      isCheckboxChecked
+    ) {
+      // Prepare the formData for your backend API.
+      const jsonData = {
+        email_id: email,
+        full_name: fullName,
+        phone_no: mobileNumber,
+        password: password,
+      };
+
+      postRequest("/users/register", jsonData)
+        .then((data) => {
+          // Handle a successful API response here
+          console.log("API response:", data);
+          toast.success("Operation was successful!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+
+          navigate("/login");
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 400) {
+            // Handle the specific 400 error with the "User with this email or phone already exists" message.
+            console.error(
+              "API error: User with this email or phone already exists"
+            );
+            toast.error("An error occurred. Please try again.", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          } else {
+            // Handle other API errors
+            console.error("API error:", error);
+            // You can handle other errors or set an appropriate error state.
+          }
+        });
+    }
+  }
 
   return (
     <div>
@@ -59,7 +173,13 @@ const SignUp = () => {
                     labelProps={{
                       className: "before:content-none after:content-none",
                     }}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                   />
+                  {fullNameError && (
+                    <p className="text-red-500 text-[12px]">{fullNameError}</p>
+                  )}
+
                   <Typography
                     variant="h6"
                     color="blue-gray"
@@ -74,8 +194,14 @@ const SignUp = () => {
                     labelProps={{
                       className: "before:content-none after:content-none",
                     }}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
-                   <Typography
+                  {emailError && (
+                    <p className="text-red-500 text-[12px]">{emailError}</p>
+                  )}
+
+                  <Typography
                     variant="h6"
                     color="blue-gray"
                     className="-mb-3 text-sm"
@@ -89,7 +215,14 @@ const SignUp = () => {
                     labelProps={{
                       className: "before:content-none after:content-none",
                     }}
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)}
                   />
+                  {mobileNumberError && (
+                    <p className="text-red-500 text-[12px]">
+                      {mobileNumberError}
+                    </p>
+                  )}
                   <Typography
                     variant="h6"
                     color="blue-gray"
@@ -105,7 +238,12 @@ const SignUp = () => {
                     labelProps={{
                       className: "before:content-none after:content-none",
                     }}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
+                  {passwordError && (
+                    <p className="text-red-500 text-[12px]">{passwordError}</p>
+                  )}
                 </div>
                 <Checkbox
                   label={
@@ -124,12 +262,18 @@ const SignUp = () => {
                     </Typography>
                   }
                   containerProps={{ className: "-ml-2.5" }}
+                  checked={isCheckboxChecked}
+                  onChange={() => setIsCheckboxChecked(!isCheckboxChecked)}
                 />
+                {checkboxError && (
+                  <p className="text-red-500">{checkboxError}</p>
+                )}
                 <Button
                   onClick={handleSignUp}
                   color="orange"
                   className="mt-6"
                   fullWidth
+                  disabled={!isCheckboxChecked}
                 >
                   sign up
                 </Button>

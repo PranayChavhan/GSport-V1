@@ -1,33 +1,55 @@
+/* eslint-disable no-unused-vars */
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-// import ErrorPage from "./error-page";
 import LoginPage from "./pages/user/LoginPage";
 import SignUp from "./pages/user/SignUp";
-
-const router = createBrowserRouter([
-  // global routes
-  {
-    path: "/",
-    element: <SignUp/>,
-  },
-  {
-    path: "/login",
-    element: <LoginPage/>
-  }
-
-  // protected routes
-  // UserRoutes,
-  // OrganizerRoutes,
-  // PlayerRoutes,
-]);
-
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { UserRoutes } from "./routes/UserRoutes";
+import React, { useEffect, useState } from "react";
 
 const App = () => {
+  const [auth, setAuth] = useState(false);
+  useEffect(() => {
+    const userDataString = localStorage.getItem("userData");
+    if (userDataString) {
+      setAuth(true);
+    }
+  }, []);
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <SignUp />,
+    },
+    {
+      path: "/login",
+      element: <LoginPage />,
+    },
+    {
+      path: "/*",
+      element: <SignUp />,
+    },
+
+    auth ? <UserRoutes /> : <SignUp />,
+  ]);
+
   return (
     <div>
-       <RouterProvider router={router}/>
+      <RouterProvider router={router} />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

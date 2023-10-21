@@ -22,15 +22,15 @@ userRouter = APIRouter()
 async def fetch_all_users(db: Session = Depends(get_db)):
     return  db.query(USERS).all()
 
-# @userRouter.get('/{userMail}')
-# async def fetch_user_by_mail(orgMail, db: Session = Depends(get_db)):
-#     user = db.query(USERS).filter(USERS.email_id == orgMail).first()
-#     if user is None:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail="user not found"
-#         )
-#     return user
+@userRouter.get('/{userMail}')
+async def fetch_user_by_mail(orgMail, db: Session = Depends(get_db)):
+    user = db.query(USERS).filter(USERS.email_id == orgMail).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="user not found"
+        )
+    return user
 
 # login functionality with access token creation
 @userRouter.post('/login')

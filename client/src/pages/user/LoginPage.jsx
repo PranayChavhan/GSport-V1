@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { getRequest, postRequest, patchRequest, deleteRequest } from '../../api/api';
+
 import {
   Card,
   Input,
@@ -12,6 +14,25 @@ import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const responseData = await getRequest('/users');
+        setData(responseData);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+
+  console.log('====================================');
+  console.log(data);
+  console.log('====================================');
 
   const handleSignIn = () => {
     navigate("/");

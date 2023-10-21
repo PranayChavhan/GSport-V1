@@ -34,8 +34,8 @@ const SignUp = () => {
           GSort***
         </p>
 
-        <div className="container py-[66px] mx-auto flex">
-          <div className="lg:w-1/3 md:w-1/2 bg-white shadow-md rounded-lg p-8 flex flex-col justify-center items-center md:ml-auto md:mt-0 relative z-10">
+        <div className="container py-[36px] mx-auto flex">
+          <div className="lg:w-1/3 md:w-1/2 bg-white shadow-md rounded-lg p-5  flex flex-col justify-center items-center md:ml-auto md:mt-0 relative z-10">
             <Card className="p-5" color="transparent" shadow={false}>
               <Typography variant="h4" color="blue-gray">
                 Sign Up
@@ -70,6 +70,21 @@ const SignUp = () => {
                   <Input
                     size="lg"
                     placeholder="example@gmail.com"
+                    className=" !border-t-blue-gray-200 focus:!border-gray-500"
+                    labelProps={{
+                      className: "before:content-none after:content-none",
+                    }}
+                  />
+                   <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className="-mb-3 text-sm"
+                  >
+                    Mobile Number
+                  </Typography>
+                  <Input
+                    size="lg"
+                    placeholder="7774860123"
                     className=" !border-t-blue-gray-200 focus:!border-gray-500"
                     labelProps={{
                       className: "before:content-none after:content-none",

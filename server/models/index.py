@@ -16,7 +16,7 @@ class USERS(Base):
     phone_no = Column(String(20), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
     verified = Column(Integer, default=0)
-    gender = Column(Integer, default=None)
+    gender = Column(String(20), default=None)
     dob = Column(Date, default=None)
     profile_url = Column(String(150), default="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJJ7NRetidOXGwJVnAJXbKD-aTCpm2iDzT6g&usqp=CAU")
     createdAt = Column(DateTime, default=datetime.datetime.utcnow)

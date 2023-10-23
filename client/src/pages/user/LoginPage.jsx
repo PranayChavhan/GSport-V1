@@ -81,7 +81,7 @@ const LoginPage = () => {
             theme: "light",
           });
 
-          navigate("/public/home");
+          navigate("/user/home");
         })
         .catch((error) => {
           if (error.response && error.response.status === 400) {

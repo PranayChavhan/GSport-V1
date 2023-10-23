@@ -6,14 +6,15 @@ import AboutUS from "../pages/user/AboutUS";
 import Blog from "../pages/user/Blog";
 import Features from "../pages/user/Features";
 import HomePage from "../pages/user/HomePage";
+import ProfilePage from "../pages/user/ProfilePage";
 
 export const UserRoutes = {
     
-    path: "/public",
+    path: "/user",
     element: <Discover/>,
     errorElement: <ErrorPage/>,
     children: [     
-        {
+        { 
             path: "home",
             element: <HomePage/>,
         },
@@ -28,6 +29,10 @@ export const UserRoutes = {
         {
             path: "blogs",
             element: <Blog/>,
+        },
+        {
+            path: "profile",
+            element: <ProfilePage/>,
         },
         
     ]

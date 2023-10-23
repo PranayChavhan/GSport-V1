@@ -181,7 +181,7 @@ const Topbar = () => {
             <Link
               to="home"
               className={`mr-5 hover:text-orange-500 cursor-pointer ${
-                location.pathname === "/public/home" ? "text-orange-500" : ""
+                location.pathname === "/user/home" ? "text-orange-500" : ""
               }`}
             >
               Home
@@ -189,7 +189,7 @@ const Topbar = () => {
             <Link
               to="aboutus"
               className={`mr-5 hover:text-orange-500 cursor-pointer ${
-                location.pathname === "/public/aboutus" ? "text-orange-500" : ""
+                location.pathname === "/user/aboutus" ? "text-orange-500" : ""
               }`}
             >
               About us
@@ -197,7 +197,7 @@ const Topbar = () => {
             <Link
               to="features"
               className={`mr-5 hover:text-orange-500 cursor-pointer ${
-                location.pathname === "/public/features"
+                location.pathname === "/user/features"
                   ? "text-orange-500"
                   : ""
               }`}
@@ -207,7 +207,7 @@ const Topbar = () => {
             <Link
               to="blogs"
               className={`mr-5 hover:text-orange-500 cursor-pointer ${
-                location.pathname === "/public/blogs" ? "text-orange-500" : ""
+                location.pathname === "/user/blogs" ? "text-orange-500" : ""
               }`}
             >
               Blog

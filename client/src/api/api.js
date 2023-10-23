@@ -21,14 +21,18 @@ export async function postRequest(URL, payload) {
   }
 }
 
-export async function patchRequest(URL, payload) {
+export async function patchRequest(URL, payload, queryParams = {}) {
   try {
-    const response = await axiosClient.patch(URL, payload);
+    const query = new URLSearchParams(queryParams); 
+    const updatedURL = `${URL}?token=${query.toString()}`;
+    
+    const response = await axiosClient.patch(updatedURL, payload);
     return response.data;
   } catch (error) {
     throw error;
   }
 }
+
 
 export async function deleteRequest(URL) {
   try {

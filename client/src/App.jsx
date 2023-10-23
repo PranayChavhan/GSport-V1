@@ -25,12 +25,8 @@ const App = () => {
       path: "/login",
       element: <LoginPage />,
     },
-    {
-      path: "/*",
-      element: <SignUp />,
-    },
 
-    auth ? <UserRoutes /> : <SignUp />,
+   UserRoutes
   ]);
 
   return (

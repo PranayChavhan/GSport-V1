@@ -28,7 +28,7 @@ const HomePage = () => {
         Play to win / Build your game
       </Typography>
       <div className="container mx-auto mt-8 px-4 flex flex-col lg:flex-row justify-center items-center lg:justify-center lg:items-start lg:gap-32">
-      <Card className="bg-gray-900 w-full max-w-[20rem] p-8 transition-all hover:scale-[1.05] mb-10">
+      <Card className="bg-gray-900 w-full max-w-[20rem] p-8 transition-all  mb-10">
       <div className="bg-blue-500 h-4 w-full absolute left-0 top-0 rounded-t-lg"></div>
         <CardHeader
           floated={false}
@@ -104,7 +104,7 @@ const HomePage = () => {
         </CardFooter>
       </Card>
       <div className="lg:mt-0 lg:ml-8">
-      <Card className="bg-gray-900 w-full max-w-[20rem] p-8 transition-all hover:scale-[1.05]">
+      <Card className="bg-gray-900 w-full max-w-[20rem] p-8 transition-all ">
       <div className="bg-red-200 h-4 w-full absolute left-0 top-0 rounded-t-lg"></div>
         <CardHeader
           floated={false}
@@ -162,7 +162,7 @@ const HomePage = () => {
           </ul>
         </CardBody>
         <CardFooter className="mt-10 p-0">
-        <Link to={"/o/dashboard"}>
+        <Link to={"/organizer/dashboard"}>
           <Button
             size="lg"
             

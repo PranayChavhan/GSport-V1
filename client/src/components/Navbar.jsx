@@ -155,9 +155,11 @@ const Topbar = () => {
     navigate("/");
   };
 
+
+
   return (
     <div>
-      <header className="text-gray-600 body-font">
+      <header className="text-gray-600 body-font border-[2px] h-[5rem]">
         <div className="mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
           <Link
             to="/home"
@@ -177,7 +179,7 @@ const Topbar = () => {
             </svg>
             <span className="ml-3 text-xl">GSort</span>
           </Link>
-          <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+          <nav className="md:ml-auto md:mr-auto flex gap-8 flex-wrap items-center text-base justify-center">
             <Link
               to="home"
               className={`mr-5 hover:text-orange-500 cursor-pointer ${

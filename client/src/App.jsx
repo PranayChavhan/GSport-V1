@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { UserRoutes } from "./routes/UserRoutes";
 import React, { useEffect, useState } from "react";
+import { OrganizerRoutes } from "./routes/OrganizerRoutes";
 
 const App = () => {
   const [auth, setAuth] = useState(false);
@@ -26,7 +27,8 @@ const App = () => {
       element: <LoginPage />,
     },
 
-   UserRoutes
+   UserRoutes,
+   OrganizerRoutes
   ]);
 
   return (

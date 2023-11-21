@@ -30,7 +30,7 @@ const sidebarItems = [
     hasSuffix: false,
   },
   {
-    linkTo: "tournaments",
+    linkTo: "tournament-tracking",
     icon: FolderIcon,
     label: "Tournament Tracking",
     hasSuffix: false,

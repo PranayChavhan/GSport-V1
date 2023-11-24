@@ -89,7 +89,7 @@ class TournamentService():
     
     # .options(joinedload(Matches.team_1).load_only(Teams.name), joinedload(Matches.team_2).load_only(Teams.name))
     def get_tournament_by_id(self, tournament_id: str):
-        tournament = self.db.query(TOURNAMENT).options(joinedload(TOURNAMENT.organizer).load_only(USERS.first_name, USERS.email_id)).filter(TOURNAMENT.id == tournament_id).first()
+        tournament = self.db.query(TOURNAMENT).filter(TOURNAMENT.id == tournament_id).first()
         
         if tournament is None:
             return GenericResponseModel(status='error', message='Tournament not found or invalid data', status_code=http.HTTPStatus.BAD_REQUEST)

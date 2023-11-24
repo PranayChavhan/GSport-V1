@@ -13,8 +13,7 @@ import Select from "react-select";
 import check from "../../assets/icons/check.png"
 import copy from "../../assets/icons/copy.png"
 import CustomizedSteppers from '../../components/Stepper';
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate, useParams } from 'react-router-dom';
 const Step2 = () => {
 
   const [textToCopy, setTextToCopy] = useState("Text to be copied");
@@ -46,6 +45,8 @@ const Step2 = () => {
 
   const [idName, setIdName] = useState();
   const navigate = useNavigate();
+  let { id } = useParams();
+
 
   return (
     <div className="w-full h-full  gap-4 ">
@@ -204,7 +205,7 @@ const Step2 = () => {
       </div>
 
       <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4 ">
-        <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step1")} >
+        <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step1/${id}`)} >
           Prev
         </Button>
         <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step3")} >

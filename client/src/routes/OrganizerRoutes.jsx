@@ -3,6 +3,7 @@ import Step2 from "../components/NewTournament/Step2"
 import Step3 from "../components/NewTournament/Step3"
 import Step4 from "../components/NewTournament/Step4"
 import Step5 from "../components/NewTournament/Step5"
+import Step1Update from "../components/NewTournament/Updatable/Step1Update"
 import ErrorPage from "../error-page"
 import Organizers from "../layout/Organizers"
 import NewTournament from "../pages/organizer/NewTournament"
@@ -48,7 +49,11 @@ export const OrganizerRoutes = {
                 element: <Step1/>
               },
               {
-                path: "step2",
+                path: "step1/:id",
+                element: <Step1Update/>
+              },
+              {
+                path: "step2/:id",
                 element: <Step2/>,
               },
               {

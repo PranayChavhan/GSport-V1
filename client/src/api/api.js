@@ -12,9 +12,12 @@ export async function getRequest(URL) {
   }
 }
 
-export async function postRequest(URL, payload) {
+export async function postRequest(URL, payload, queryParams = {}) {
   try {
-    const response = await axiosClient.post(URL, payload);
+    const query = new URLSearchParams(queryParams); 
+    const updatedURL = `${URL}?token=${query.toString()}`;
+
+    const response = await axiosClient.post(updatedURL, payload);
     return response.data;
   } catch (error) {
     throw error;

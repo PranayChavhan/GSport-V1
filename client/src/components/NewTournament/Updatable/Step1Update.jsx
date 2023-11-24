@@ -9,11 +9,12 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { toast } from "react-toastify";
 // import { useDispatch } from "react-redux";
 // import { setTournamentDetails } from "../../../redux/features/tournamentSlice";
-import CustomizedSteppers from "../../components/Stepper";
-import { useNavigate } from "react-router-dom";
+import CustomizedSteppers from "../../../components/Stepper";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-  postRequest,
-} from "../../api/api";
+  patchRequest,
+  getRequest
+} from "../../../api/api";
 
 
 function Success() {
@@ -35,18 +36,23 @@ function Success() {
   );
 }
 
-const Step1 = () => {
+const Step1Update = () => {
   const navigate = useNavigate()
+  let { id } = useParams();
+
+
   const [organizationName, setOrganizationName] = useState("");
   const [organizationDescription, setOrganizationDescription] = useState("");
   const [tournamentName, setTournamentName] = useState("");
   const [tournamentDescription, setTournamentDescription] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [id, setId] = useState("");
+  const [oid, setOid] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [token, setToken] = useState("");
   const [idParam, setIdParam] = useState("");
+  const [tournamentData, setTournamentData] = useState(null);
+
 
   const handleOrganizationNameChange = (event) => {
     setOrganizationName(event.target.value);
@@ -65,6 +71,25 @@ const Step1 = () => {
   };
 
 
+ useEffect(() => {
+    const fetchTournamentData = async () => {
+      try {
+        const url = 'tournaments/DDbHeHy2rjuHuKb4';
+        const data = await getRequest(url);
+        setTournamentData(data.data);
+        setOrganizationName(data.data.organizer_name);
+        setOrganizationDescription(data.data.organizer_info);
+        setTournamentName(data.data.name);
+        setTournamentDescription(data.data.about);
+        setStartDate(new Date(data.data.start_date));
+        setEndDate(new Date(data.data.end_date));
+      } catch (error) {
+        console.error('Error fetching tournament data:', error);
+      }
+    };
+    fetchTournamentData();
+  }, []);
+  
   useEffect(() => {
     const getCookie = (name) => {
       const cookies = document.cookie.split(';');
@@ -85,18 +110,21 @@ const Step1 = () => {
   }, []);
 
 
+
+
   useEffect(() => {
     // Fetch the item from localStorage
     const userId = localStorage.getItem('userData');
     if (userId) {
       try {
         const userData = JSON.parse(userId);
-        setId(userData.id);
+        setOid(userData.id);
       } catch (error) {
         console.error('Error parsing userData:', error);
       }
     }
   }, []);
+
 
   
   const handleProceed = async () => {
@@ -175,48 +203,53 @@ const Step1 = () => {
     return;
   }
 
+  const toSent = {
+    name: tournamentName,
+    about: tournamentDescription,
+    organizer_id: oid,
+    organizer_name: organizationName,
+    organizer_info: organizationDescription,
+    start_date: new Date(startDate).toISOString(),
+    end_date: new Date(endDate).toISOString(),
+    is_payment_done: true,
+    is_active: true,
+  };
 
+  patchRequest(`organizer/tournament/${id}`, toSent, token)
+        .then((data) => {
+          // Handle a successful API response here
+          console.log("API response:", data);
+          toast.success("Updates successful!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }); 
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 400) {
+            console.error(
+              "API error"
+            );
+            toast.error("An error occurred. Please try again.", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          } else {
+            console.error("API error:", error);
+          }
+        });
 
-    try {
-      const toSent = {
-        name: tournamentName,
-        about: tournamentDescription,
-        organizer_id: id,
-        organizer_name: organizationName,
-        organizer_info: organizationDescription,
-        start_date: new Date(startDate).toISOString(),
-        end_date: new Date(endDate).toISOString(),
-        is_payment_done: true,
-        is_active: true,
-      };
-      
-      const response = await postRequest('organizer/tournament', toSent, token);
-      setIdParam(response.data.id)
-      toast.success('🦄 Congratulations!!!!!', {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        });
-        setIsSuccess(true);
-      
-    } catch (error) {
-      const errorMessage = error?.data?.detail || "An error occurred";
-      toast.error(errorMessage, {
-        position: "top-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        });
-    }
   };
 
 
@@ -245,7 +278,7 @@ const Step1 = () => {
             <div className="flex flex-col gap-4 justify-between">
               <div className="flex flex-col justify-start w-full ">
                 <p className=" text-blue-gray-700 text-2xl  md:text-3xl font-poppins font-bold ">
-                  Organisational Details
+                  Organisational Details heh
                 </p>
 
                 <div className="mt-4 font-poppins ">
@@ -358,4 +391,4 @@ const Step1 = () => {
   );
 };
 
-export default Step1;
+export default Step1Update;

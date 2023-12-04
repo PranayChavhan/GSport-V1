@@ -57,7 +57,7 @@ export const OrganizerRoutes = {
                 element: <Step2/>,
               },
               {
-                path: "step3",
+                path: "step3/:id",
                 element: <Step3/>,
               },
             //   {

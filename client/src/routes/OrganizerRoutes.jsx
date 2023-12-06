@@ -60,16 +60,12 @@ export const OrganizerRoutes = {
                 path: "step3/:id",
                 element: <Step3/>,
               },
-            //   {
-            //     path: "added-games",
-            //     element: <AllAddedGames />,
-            //   },
               {
-                path: "step4",
+                path: "step4/:id",
                 element: <Step4/>,
               },
               {
-                path: "step5",
+                path: "step5/:id",
                 element: <Step5/>,
               },
             ],

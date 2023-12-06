@@ -67,7 +67,9 @@ class TOURNAMENT(Base):
     organizer_info = Column(String(150), nullable=False)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
+    
     is_payment_done = Column(Boolean, default=True)
+    payment_id = Column(String(100), nullable=True)
     is_active = Column(Boolean, default=True)
     tournament_games = relationship("TOURNAMENT_GAMES", back_populates="tournament")
 

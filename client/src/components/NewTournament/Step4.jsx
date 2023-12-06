@@ -1,64 +1,127 @@
 /* eslint-disable no-unused-vars */
 // import React from 'react'
 
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
-  Card,
-  CardHeader,
-  CardBody,
-  Input,
   Button,
-  Typography,
-  Tabs,
-  TabsHeader,
-  TabsBody,
-  Tab,
-  TabPanel,
 } from "@material-tailwind/react";
-import {
-  CreditCardIcon,
-  LockClosedIcon,
-} from "@heroicons/react/24/solid";
 import CustomizedSteppers from "../../components/Stepper";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom';
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { toast } from "react-toastify";
+import {
+  patchRequest,
+} from "../../api/api";
 
- 
-function formatCardNumber(value) {
-  const val = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-  const matches = val.match(/\d{4,16}/g);
-  const match = (matches && matches[0]) || "";
-  const parts = [];
- 
-  for (let i = 0, len = match.length; i < len; i += 4) {
-    parts.push(match.substring(i, i + 4));
-  }
- 
-  if (parts.length) {
-    return parts.join(" ");
-  } else {
-    return value;
-  }
-}
- 
-function formatExpires(value) {
-  return value.replace(/[^0-9]/g, "")
-    .replace(/^([2-9])$/g, "0$1")
-    .replace(/^(1{1})([3-9]{1})$/g, "0$1/$2")
-    .replace(/^0{1,}/g, "0")
-    .replace(/^([0-1]{1}[0-9]{1})([0-9]{1,2}).*/g, "$1/$2");
-}
+
+
+
+
 
 
 const Step4 = () => {
         
-    const [type, setType] = React.useState("card");
-    const [cardNumber, setCardNumber] = React.useState("");
-    const [cardExpires, setCardExpires] = React.useState("");
-
     const [confirmPayment, setConfirmPayment] = useState(false);
-
+    const [paymentId, setPaymentId] = useState("");
+    const [token, setToken] = useState("");
     const navigate = useNavigate();
-   
+    let { id } = useParams();
+
+    useEffect(() => {
+      const getCookie = (name) => {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + '=')) {
+            return cookie.substring(name.length + 1);
+          }
+        }
+        return null;
+      };
+      const jwtToken = getCookie('jwt_auth_token');
+      if (jwtToken) {
+        setToken(jwtToken);
+      } else {
+        console.log('JWT Token not found in cookies');
+      }
+    }, []);
+    
+    const launchRazorPay = () => {
+      let options = {
+        key: "rzp_test_UR1RXcKK4NZyYp",
+        amount: 100*100,
+        currency: "INR",
+        name: "G Sort",
+        description: "Movie purchase or rental",
+        image:
+          "https://i.ibb.co/zPBYW3H/imgbin-bookmyshow-office-android-ticket-png.png",
+          handler: response => {
+            const payId = response.razorpay_payment_id;
+            setPaymentId(payId);
+            setConfirmPayment(true);
+            if (payId) {
+              patchRequest(`organizer/tournament/${id}/`, {is_payment_done: true, payment_id: payId}, token)
+                .then((data) => {
+                  toast.success("Operation was successful!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                  });
+                  
+                //   navigate("/user/home");
+                })
+                .catch((error) => {
+                  if (error.response && error.response.status === 400) {
+                    console.error("API error: Invalid Creedentials");
+                    toast.error("Error", {
+                      position: "top-right",
+                      autoClose: 5000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "light",
+                    });
+                  } else {
+                    console.error("API error:", error);
+                  }
+                });
+            }
+          },
+        theme: { color: "#ff9800" },
+      };
+      let razorPay = window.Razorpay(options);
+      razorPay.open();
+    };
+
+
+
+    function Success() {
+      return (
+        <div>
+          <div className="flex flex-col justify-center items-center gap-3">
+            <p className="text-6xl">
+              <CheckCircleOutlineIcon
+                fontSize="inherit"
+                className="text-green-400"
+              />
+            </p>
+            <p className="font-poppins text-xl">Payment Succesfully</p>
+            <p>Payment ID: {paymentId}</p>
+            <p className="font-poppins text-sm text-gray-600">
+              Now you can add players to the tournament
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     return (
 
       <div className="w-full flex flex-col justify-center items-center gap-4">
@@ -66,189 +129,78 @@ const Step4 = () => {
           <CustomizedSteppers step={3}/>
         </div>
       {
-        confirmPayment && (
+        confirmPayment ? (
 
-          <div className="text-xl w-full flex items-end justify-end">
+          <>
+        <Success />
+        <div className="w-full flex flex-row  items-center justify-center pt-10 gap-4">
+        <div className="text-xl w-full flex items-end justify-center">
             <Button  size="lg" color="orange">Download Receipt</Button>
           </div> 
+          </div>
+        </>
+        ):
+        (
+          <>
+                <section className="text-gray-600 body-font overflow-hidden">
+  <div className="container px-5 mx-auto">
+    <div className="flex flex-col text-center w-full  ">
+      <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Pricing</h1>
+      <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-gray-500">Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical.</p>
+    </div>
+    <div className="">
+      <div className="p-4 w-full">
+        <div className="h-full p-6 rounded-lg  flex flex-col relative overflow-hidden">
+          <h2 className="text-sm tracking-widest title-font mb-1 font-medium">START</h2>
+          <h1 className="text-5xl text-gray-900 pb-4 mb-4 border-b border-gray-200 leading-none">Free</h1>
+          <p className="flex items-center text-gray-600 mb-2">
+            <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
+              <svg fill="none" stroke="currentColor"  className="w-3 h-3" viewBox="0 0 24 24">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+            </span>Vexillologist pitchfork
+          </p>
+          <p className="flex items-center text-gray-600 mb-2">
+            <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
+              <svg fill="none" stroke="currentColor"  className="w-3 h-3" viewBox="0 0 24 24">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+            </span>Tumeric plaid portland
+          </p>
+          <p className="flex items-center text-gray-600 mb-6">
+            <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
+              <svg fill="none" stroke="currentColor"  className="w-3 h-3" viewBox="0 0 24 24">
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+            </span>Mixtape chillwave tumeric
+          </p>
+          <button
+          onClick={launchRazorPay}
+           className="flex items-center mt-auto text-white bg-orange-500 border-0 py-2 px-4 w-full focus:outline-none hover:bg-gray-500 rounded">
+            Procced To pay
+            <svg fill="none" stroke="currentColor" className="w-4 h-4 ml-auto text-white" viewBox="0 0 24 24">
+              <path d="M5 12h14M12 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <p className="text-xs text-gray-500 mt-3">Literally you probably havent heard of them jean shorts.</p>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</section>
+          </>
         )
       }
       
       
-      <Card className="w-full max-w-[28rem]  h-[36rem]">
-        <CardHeader
-          color=""
-          floated={false}
-          shadow={false}
-          className="m-0 grid place-items-center rounded-b-none text-left"
-        >
-         
-        </CardHeader>
-        <CardBody>
-          <Tabs value={type} className="overflow-visible">
-            <TabsHeader className="relative z-0 ">
-              <Tab value="card" className="text-xs sm:text-sm" onClick={() => setType("card")}>
-                Card
-              </Tab>
-              <Tab value="RazorPay" 
-              className="text-xs sm:text-sm" 
-              // onClick={() => setType("UPI")}
-              // razorpay modal calling
-              >
-                RazorPay
-              </Tab>
-              <Tab value="paypal" className="text-xs sm:text-sm" onClick={() => setType("paypal")}>
-                PayPal
-              </Tab>
-            </TabsHeader>
-            <TabsBody
-              className="!overflow-x-hidden !overflow-y-visible"
-              animate={{
-                initial: {
-                  x: type === "card" ? 400 : type === "paypal" ? -400 : -800,
-                },
-                mount: {
-                  x: 0,
-                },
-                unmount: {
-                  x: type === "card" ? 400 : type === "paypal" ? -400 : -800,
-                },
-              }}
-            >
-              <TabPanel value="card" className="p-0">
-                <form className="mt-12 flex flex-col gap-4">
-                  <div>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="mb-4 font-medium"
-                    >
-                      Personal Details
-                    </Typography>
-                    <Input type="email" label="Email Address" />
-                  </div>
-   
-                  <div className="my-6">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="mb-4 font-medium"
-                    >
-                      Card Details
-                    </Typography>
-   
-                    <Input
-                      label="Card Number"
-                      maxLength={19}
-                      value={formatCardNumber(cardNumber)}
-                      onChange={(event) => setCardNumber(event.target.value)}
-                      icon={
-                        <CreditCardIcon className="h-5 w-5 text-blue-gray-300" />
-                      }
-                    />
-                    <div className="my-4 flex items-center gap-4">
-                      <Input
-                        label="Expires"
-                        maxLength={5}
-                        value={formatExpires(cardExpires)}
-                        onChange={(event) => setCardExpires(event.target.value)}
-                        containerProps={{ className: "min-w-[72px]" }}
-                      />
-                      <Input
-                        label="CVC"
-                        maxLength={4}
-                        containerProps={{ className: "min-w-[72px]" }}
-                      />
-                    </div>
-                    <Input label="Holder Name" />
-                  </div>
-                  <Button size="lg" color="orange">Pay Now</Button>
-                  <Typography
-                    variant="small"
-                    color="gray"
-                    className="mt-2 flex items-center justify-center gap-2 font-normal opacity-60"
-                  >
-                    <LockClosedIcon className="-mt-0.5 h-4 w-4" /> Payments are
-                    secure and encrypted
-                  </Typography>
-                </form>
-              </TabPanel>
-              <TabPanel value="RazorPay" className="p-0 h-full">
-                <form className="mt-12 flex flex-col gap-4">
-                  <div>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="mb-4 font-medium"
-                    >
-                      Enter UPI Id / Mobile No
-                    </Typography>
-                    <Input type="text" label="UPI Id / Mobile No" />
-                  </div>
-                  <Button size="lg" color="orange">Proceed to Payment</Button>
-                  <Typography
-                    variant="small"
-                    color="gray"
-                    className="mt-2 flex items-center justify-center gap-2 font-normal opacity-60"
-                  >
-                    <LockClosedIcon className="-mt-0.5 h-4 w-4" /> Payments are
-                    secure and encrypted
-                  </Typography>
-                </form>
-              </TabPanel>
-              <TabPanel value="paypal" className="p-0 h-full">
-                <form className="mt-12 flex flex-col gap-4">
-                  <div>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="mb-4 font-medium"
-                    >
-                      Personal Details
-                    </Typography>
-                    <Input type="email" label="Email Address" />
-                  </div>
-   
-                  <div className="my-6">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="mb-4 font-medium"
-                    >
-                      Billing Address
-                    </Typography>
-   
-                    <Input
-                      label="Postal Code"
-                      containerProps={{ className: "mt-4" }}
-                    />
-                  </div>
-                  <Button size="lg" color="amber" className="relative h-12">
-                    <img
-                      alt="paypal "
-                      className="absolute top-2/4 left-2/4 w-16 -translate-x-2/4 -translate-y-2/4"
-                      src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAxcHgiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAxMDEgMzIiIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaW5ZTWluIG1lZXQiIHhtbG5zPSJodHRwOiYjeDJGOyYjeDJGO3d3dy53My5vcmcmI3gyRjsyMDAwJiN4MkY7c3ZnIj48cGF0aCBmaWxsPSIjMDAzMDg3IiBkPSJNIDEyLjIzNyAyLjggTCA0LjQzNyAyLjggQyAzLjkzNyAyLjggMy40MzcgMy4yIDMuMzM3IDMuNyBMIDAuMjM3IDIzLjcgQyAwLjEzNyAyNC4xIDAuNDM3IDI0LjQgMC44MzcgMjQuNCBMIDQuNTM3IDI0LjQgQyA1LjAzNyAyNC40IDUuNTM3IDI0IDUuNjM3IDIzLjUgTCA2LjQzNyAxOC4xIEMgNi41MzcgMTcuNiA2LjkzNyAxNy4yIDcuNTM3IDE3LjIgTCAxMC4wMzcgMTcuMiBDIDE1LjEzNyAxNy4yIDE4LjEzNyAxNC43IDE4LjkzNyA5LjggQyAxOS4yMzcgNy43IDE4LjkzNyA2IDE3LjkzNyA0LjggQyAxNi44MzcgMy41IDE0LjgzNyAyLjggMTIuMjM3IDIuOCBaIE0gMTMuMTM3IDEwLjEgQyAxMi43MzcgMTIuOSAxMC41MzcgMTIuOSA4LjUzNyAxMi45IEwgNy4zMzcgMTIuOSBMIDguMTM3IDcuNyBDIDguMTM3IDcuNCA4LjQzNyA3LjIgOC43MzcgNy4yIEwgOS4yMzcgNy4yIEMgMTAuNjM3IDcuMiAxMS45MzcgNy4yIDEyLjYzNyA4IEMgMTMuMTM3IDguNCAxMy4zMzcgOS4xIDEzLjEzNyAxMC4xIFoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMDAzMDg3IiBkPSJNIDM1LjQzNyAxMCBMIDMxLjczNyAxMCBDIDMxLjQzNyAxMCAzMS4xMzcgMTAuMiAzMS4xMzcgMTAuNSBMIDMwLjkzNyAxMS41IEwgMzAuNjM3IDExLjEgQyAyOS44MzcgOS45IDI4LjAzNyA5LjUgMjYuMjM3IDkuNSBDIDIyLjEzNyA5LjUgMTguNjM3IDEyLjYgMTcuOTM3IDE3IEMgMTcuNTM3IDE5LjIgMTguMDM3IDIxLjMgMTkuMzM3IDIyLjcgQyAyMC40MzcgMjQgMjIuMTM3IDI0LjYgMjQuMDM3IDI0LjYgQyAyNy4zMzcgMjQuNiAyOS4yMzcgMjIuNSAyOS4yMzcgMjIuNSBMIDI5LjAzNyAyMy41IEMgMjguOTM3IDIzLjkgMjkuMjM3IDI0LjMgMjkuNjM3IDI0LjMgTCAzMy4wMzcgMjQuMyBDIDMzLjUzNyAyNC4zIDM0LjAzNyAyMy45IDM0LjEzNyAyMy40IEwgMzYuMTM3IDEwLjYgQyAzNi4yMzcgMTAuNCAzNS44MzcgMTAgMzUuNDM3IDEwIFogTSAzMC4zMzcgMTcuMiBDIDI5LjkzNyAxOS4zIDI4LjMzNyAyMC44IDI2LjEzNyAyMC44IEMgMjUuMDM3IDIwLjggMjQuMjM3IDIwLjUgMjMuNjM3IDE5LjggQyAyMy4wMzcgMTkuMSAyMi44MzcgMTguMiAyMy4wMzcgMTcuMiBDIDIzLjMzNyAxNS4xIDI1LjEzNyAxMy42IDI3LjIzNyAxMy42IEMgMjguMzM3IDEzLjYgMjkuMTM3IDE0IDI5LjczNyAxNC42IEMgMzAuMjM3IDE1LjMgMzAuNDM3IDE2LjIgMzAuMzM3IDE3LjIgWiI+PC9wYXRoPjxwYXRoIGZpbGw9IiMwMDMwODciIGQ9Ik0gNTUuMzM3IDEwIEwgNTEuNjM3IDEwIEMgNTEuMjM3IDEwIDUwLjkzNyAxMC4yIDUwLjczNyAxMC41IEwgNDUuNTM3IDE4LjEgTCA0My4zMzcgMTAuOCBDIDQzLjIzNyAxMC4zIDQyLjczNyAxMCA0Mi4zMzcgMTAgTCAzOC42MzcgMTAgQyAzOC4yMzcgMTAgMzcuODM3IDEwLjQgMzguMDM3IDEwLjkgTCA0Mi4xMzcgMjMgTCAzOC4yMzcgMjguNCBDIDM3LjkzNyAyOC44IDM4LjIzNyAyOS40IDM4LjczNyAyOS40IEwgNDIuNDM3IDI5LjQgQyA0Mi44MzcgMjkuNCA0My4xMzcgMjkuMiA0My4zMzcgMjguOSBMIDU1LjgzNyAxMC45IEMgNTYuMTM3IDEwLjYgNTUuODM3IDEwIDU1LjMzNyAxMCBaIj48L3BhdGg+PHBhdGggZmlsbD0iIzAwOWNkZSIgZD0iTSA2Ny43MzcgMi44IEwgNTkuOTM3IDIuOCBDIDU5LjQzNyAyLjggNTguOTM3IDMuMiA1OC44MzcgMy43IEwgNTUuNzM3IDIzLjYgQyA1NS42MzcgMjQgNTUuOTM3IDI0LjMgNTYuMzM3IDI0LjMgTCA2MC4zMzcgMjQuMyBDIDYwLjczNyAyNC4zIDYxLjAzNyAyNCA2MS4wMzcgMjMuNyBMIDYxLjkzNyAxOCBDIDYyLjAzNyAxNy41IDYyLjQzNyAxNy4xIDYzLjAzNyAxNy4xIEwgNjUuNTM3IDE3LjEgQyA3MC42MzcgMTcuMSA3My42MzcgMTQuNiA3NC40MzcgOS43IEMgNzQuNzM3IDcuNiA3NC40MzcgNS45IDczLjQzNyA0LjcgQyA3Mi4yMzcgMy41IDcwLjMzNyAyLjggNjcuNzM3IDIuOCBaIE0gNjguNjM3IDEwLjEgQyA2OC4yMzcgMTIuOSA2Ni4wMzcgMTIuOSA2NC4wMzcgMTIuOSBMIDYyLjgzNyAxMi45IEwgNjMuNjM3IDcuNyBDIDYzLjYzNyA3LjQgNjMuOTM3IDcuMiA2NC4yMzcgNy4yIEwgNjQuNzM3IDcuMiBDIDY2LjEzNyA3LjIgNjcuNDM3IDcuMiA2OC4xMzcgOCBDIDY4LjYzNyA4LjQgNjguNzM3IDkuMSA2OC42MzcgMTAuMSBaIj48L3BhdGg+PHBhdGggZmlsbD0iIzAwOWNkZSIgZD0iTSA5MC45MzcgMTAgTCA4Ny4yMzcgMTAgQyA4Ni45MzcgMTAgODYuNjM3IDEwLjIgODYuNjM3IDEwLjUgTCA4Ni40MzcgMTEuNSBMIDg2LjEzNyAxMS4xIEMgODUuMzM3IDkuOSA4My41MzcgOS41IDgxLjczNyA5LjUgQyA3Ny42MzcgOS41IDc0LjEzNyAxMi42IDczLjQzNyAxNyBDIDczLjAzNyAxOS4yIDczLjUzNyAyMS4zIDc0LjgzNyAyMi43IEMgNzUuOTM3IDI0IDc3LjYzNyAyNC42IDc5LjUzNyAyNC42IEMgODIuODM3IDI0LjYgODQuNzM3IDIyLjUgODQuNzM3IDIyLjUgTCA4NC41MzcgMjMuNSBDIDg0LjQzNyAyMy45IDg0LjczNyAyNC4zIDg1LjEzNyAyNC4zIEwgODguNTM3IDI0LjMgQyA4OS4wMzcgMjQuMyA4OS41MzcgMjMuOSA4OS42MzcgMjMuNCBMIDkxLjYzNyAxMC42IEMgOTEuNjM3IDEwLjQgOTEuMzM3IDEwIDkwLjkzNyAxMCBaIE0gODUuNzM3IDE3LjIgQyA4NS4zMzcgMTkuMyA4My43MzcgMjAuOCA4MS41MzcgMjAuOCBDIDgwLjQzNyAyMC44IDc5LjYzNyAyMC41IDc5LjAzNyAxOS44IEMgNzguNDM3IDE5LjEgNzguMjM3IDE4LjIgNzguNDM3IDE3LjIgQyA3OC43MzcgMTUuMSA4MC41MzcgMTMuNiA4Mi42MzcgMTMuNiBDIDgzLjczNyAxMy42IDg0LjUzNyAxNCA4NS4xMzcgMTQuNiBDIDg1LjczNyAxNS4zIDg1LjkzNyAxNi4yIDg1LjczNyAxNy4yIFoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMDA5Y2RlIiBkPSJNIDk1LjMzNyAzLjMgTCA5Mi4xMzcgMjMuNiBDIDkyLjAzNyAyNCA5Mi4zMzcgMjQuMyA5Mi43MzcgMjQuMyBMIDk1LjkzNyAyNC4zIEMgOTYuNDM3IDI0LjMgOTYuOTM3IDIzLjkgOTcuMDM3IDIzLjQgTCAxMDAuMjM3IDMuNSBDIDEwMC4zMzcgMy4xIDEwMC4wMzcgMi44IDk5LjYzNyAyLjggTCA5Ni4wMzcgMi44IEMgOTUuNjM3IDIuOCA5NS40MzcgMyA5NS4zMzcgMy4zIFoiPjwvcGF0aD48L3N2Zz4"
-                    />
-                  </Button>
-                  <Typography
-                    variant="small"
-                    color="gray"
-                    className="mt-2 flex items-center justify-center gap-2 font-normal opacity-60"
-                  >
-                    <LockClosedIcon className="-mt-0.5 h-4 w-4" /> Payments are
-                    secure and encrypted
-                  </Typography>
-                </form>
-              </TabPanel>
-            </TabsBody>
-          </Tabs>
-        </CardBody>
-      </Card>
+
       <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4 ">
-        <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step3")} >
+        <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step3/${id}`)} >
           Prev
         </Button>
-        <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step5")} >
+        <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step5/${id}`)} >
           Next
         </Button>
       </div>

@@ -208,7 +208,7 @@ const Step2 = () => {
         <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step1/${id}`)} >
           Prev
         </Button>
-        <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step3")} >
+        <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step3/${id}`)} >
           Next
         </Button>
       </div>

@@ -8,7 +8,7 @@ import {
   Select as MSelect,
   Option,
 } from "@material-tailwind/react";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DatePicker from "react-datepicker";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,6 +16,27 @@ import {
     postRequest,
   } from "../../api/api";
   
+
+  function Success() {
+    return (
+      <div>
+        <div className="flex flex-col justify-center items-center gap-3">
+          <p className="text-6xl">
+            <CheckCircleOutlineIcon
+              fontSize="inherit"
+              className="text-green-400"
+            />
+          </p>
+          <p className="font-poppins text-xl">Game added Succesfully</p>
+          <p className="font-poppins text-sm text-gray-600">
+            Now you can procced to the payment
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+
 const AddGame = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -28,7 +49,7 @@ const AddGame = () => {
   const [token, setToken] = useState("");
   const initialValues = {
     name: null,
-    tournament_id: "123",
+    tournament_id: id.toString(),
     game_id: "256",
     info: null, 
     prize_pool: null,
@@ -36,8 +57,8 @@ const AddGame = () => {
     team_size: null,
     max_teams: null,
     total_rounds: null,
-    min_boys: null,
-    min_girls: null,
+    min_boys: 0,
+    min_girls: 0,
     open_to: whoCanParticipate,
     min_age: null,
     max_age: null,
@@ -107,6 +128,20 @@ const AddGame = () => {
     });
   };
 
+  const gameOptions = [
+    {
+      value: 1,
+      label: "Cricket",
+    },
+    {
+      value: 2,
+      label: "Football",
+    },
+    {
+      value: 3,
+      label: "Badminton",
+    }
+  ];
   const handleGameChange = (selectedId) => {
     setValues({
       ...values,
@@ -186,10 +221,10 @@ const AddGame = () => {
   return (
     <div  className="w-full gap-8 py-5 border-t-2 ">
       {isSuccess ? (
-        <div className="flex items-center justify-start mx-auto text-xl font-poppins gap-3">
-          <CheckCircleIcon className="text-green-500" />{" "}
-          <p>Game added Successfully</p>
-        </div>
+         <>
+         <Success />
+         
+         </>
       ) : (
         <div className="space-y-4 shadow-sm md:p-4 w-full ">
           <div className="w-full lg:p-4 border border-black-100 rounded-lg flex flex-col gap-6">
@@ -213,7 +248,15 @@ const AddGame = () => {
                   color="orange"
                   label="select game to be played"
                 >
-                  <Option>game 1</Option>
+                  {gameOptions ? (
+                    gameOptions.map((o, index) => (
+                      <Option key={index} className="capitalize" value={o.value}>
+                        {o.label}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option>game 1</Option>
+                  )}
                 </MSelect>
               </div>
             </div>

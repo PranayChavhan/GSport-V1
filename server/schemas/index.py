@@ -30,7 +30,8 @@ class Tournament(BaseModel):
     organizer_info: str
     start_date: datetime.datetime
     end_date: datetime.datetime
-    is_payment_done: bool = True
+    is_payment_done: bool = False
+    payment_id: str
     is_active: bool = True
 
 class Tournament_Games(BaseModel):

@@ -28,14 +28,14 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom';
 import CustomizedSteppers from "../../components/Stepper";
 
 
 export default function Step5() {
 
   const navigate = useNavigate();
-
+  let { id } = useParams();
   const [textToCopy, setTextToCopy] = useState("Text to be copied");
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -206,7 +206,7 @@ export default function Step5() {
     </div>
 
       <div className="w-full flex flex-row  items-center justify-center lg:justify-start gap-4 ">
-        <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step4")} >
+        <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step4/${id}`)} >
           Prev
         </Button>
       </div>

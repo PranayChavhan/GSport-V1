@@ -3,11 +3,10 @@ import { useState } from "react";
 // import AddGame from './AddGame';
 import { Button } from "@material-tailwind/react";
 // import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CustomizedSteppers from "../../components/Stepper";
 import AddGame from "./AddGame";
 const Step3 = () => {
-  
   // const dispatch = useDispatch();
 
   const [gameCount, setGameCount] = useState(1); // State to track the number of games
@@ -23,7 +22,7 @@ const Step3 = () => {
   };
 
   const navigate = useNavigate();
-
+  let { id } = useParams();
   return (
 
     <div className='w-full flex flex-col gap-4'>
@@ -50,10 +49,10 @@ const Step3 = () => {
       </div>
 
       <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4 ">
-        <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step2")} >
+        <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step2/${id}`)} >
           Prev
         </Button>
-        <Button color='orange' onClick={()=> navigate("/organizer/new-tournament/step4")} >
+        <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step4/${id}`)} >
           Next
         </Button>
       </div>

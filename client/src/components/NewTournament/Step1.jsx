@@ -187,6 +187,7 @@ const Step1 = () => {
         start_date: new Date(startDate).toISOString(),
         end_date: new Date(endDate).toISOString(),
         is_payment_done: true,
+        payment_id: "",
         is_active: true,
       };
       

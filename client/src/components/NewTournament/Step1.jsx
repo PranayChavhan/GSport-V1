@@ -223,6 +223,23 @@ const Step1 = () => {
 
   const isLoading = false;
 
+
+  const [image, setImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setImage(reader.result);
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
+
   return (
     <div className="w-full h-full">
                   <div className="w-full py-10">
@@ -241,9 +258,50 @@ const Step1 = () => {
           </div>
         </>
       ) : (
+
         <div className="w-full space-y-4">
           <div className=" mt-2 md:mt-4 w-full sm:w-4/4 lg:w-full py-2 md:py-5 rounded-lg flex flex-col  justify-center items-center shadow-md">
-            <div className="flex flex-col gap-4 justify-between">
+            
+            <div className="grid grid-cols-6 gap-4">
+
+            <div className="col-start-1 col-end-3 justify-center items-center flex mx-10">
+
+
+            <div className="flex items-center justify-center w-full h-full border-dashed border-[2px] border-gray-400 ">
+      <div className="flex flex-col items-center mt-8">
+        <label className="relative cursor-pointer">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="hidden"
+          />
+          <div className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">
+            Browse
+          </div>
+        </label>
+        {image ? (
+          <img
+            src={image}
+            alt="Preview"
+            className="w-[32rem] h-[28rem] rounded-md mt-4" // Adjust width and height as needed
+          />
+        )
+        :
+        (
+          <>
+          <p className="text-sm mt-2">Upload file</p>
+          </>
+        )
+      }
+      </div>
+    </div>
+
+
+            </div>
+
+
+            <div className="flex flex-col gap-4 justify-between col-start-3 col-end-5">
               <div className="flex flex-col justify-start w-full ">
                 <p className=" text-blue-gray-700 text-2xl  md:text-3xl font-poppins font-bold ">
                   Organisational Details
@@ -344,6 +402,9 @@ const Step1 = () => {
                 </div>
               </div>
             </div>
+            </div>
+
+
             <div className="flex justify-center mt-8">
               <Button
                 className="flex items-center justify-center bg-orange-500 hover:bg-orange-700 text-white py-2 px-4 rounded-lg w-full"

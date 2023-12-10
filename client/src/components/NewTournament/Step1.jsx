@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import {
   postRequest,
 } from "../../api/api";
-
+import axios from 'axios';
 
 function Success() {
   return (
@@ -49,8 +49,10 @@ const Step1 = () => {
   const [idParam, setIdParam] = useState("");
   const [image, setImage] = useState(null);
   const [imgData, setImgData] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imgName, setImgName] = useState("")
 
-
+  
   const handleOrganizationNameChange = (event) => {
     setOrganizationName(event.target.value);
   };
@@ -100,6 +102,48 @@ const Step1 = () => {
       }
     }
   }, []);
+
+
+
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(e.target.files[0]);
+    const reader = new FileReader();
+
+    setImgData(file);
+
+    if (imgData){
+      try {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+  
+        // Adjust the URL based on your FastAPI server address
+        const apiUrl = 'http://127.0.0.1:8000/organizer/files';
+  
+        const response = await axios.post(apiUrl, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setImgName(response.data)
+        console.log('File uploaded successfully:', response.data);
+        // Handle success, e.g., update state or display a success message
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        // Handle error, e.g., display an error message
+      }
+    }
+    reader.onloadend = () => {
+      setImage(reader.result);
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
+
+
 
   
   const handleProceed = async () => {
@@ -191,13 +235,9 @@ const Step1 = () => {
         end_date: new Date(endDate).toISOString(),
         is_payment_done: true,
         payment_id: "",
-        image: image,
+        image: imgName,
         is_active: true,
       };
-      
-      // console.log('====================================');
-      // console.log(toSent);
-      // console.log('====================================');
       const response = await postRequest('organizer/tournament', toSent, token);
       setIdParam(response.data.id)
       toast.success('🦄 Congratulations!!!!!', {
@@ -227,22 +267,36 @@ const Step1 = () => {
     }
   };
 
+ 
+
+  // const handleUpload = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append('file', selectedFile);
+
+  //     // Adjust the URL based on your FastAPI server address
+  //     const apiUrl = 'http://127.0.0.1:8000/organizer/files';
+
+  //     const response = await axios.post(apiUrl, formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     });
+
+      
+  //     console.log('File uploaded successfully:', response.data);
+  //     // Handle success, e.g., update state or display a success message
+  //   } catch (error) {
+  //     console.error('Error uploading file:', error);
+  //     // Handle error, e.g., display an error message
+  //   }
+  // };
+
+
+
 
   const isLoading = false;
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    setImgData(file);
-    
-    reader.onloadend = () => {
-      setImage(reader.result);
-    };
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
   return (
     <div className="w-full h-full">
                   <div className="w-full py-10">
@@ -298,6 +352,7 @@ const Step1 = () => {
         )
       }
       </div>
+      
     </div>
 
 

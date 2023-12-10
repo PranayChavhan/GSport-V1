@@ -6,7 +6,7 @@ import shortuuid
 from utils.general import model_to_dict
 import http
 from datetime import datetime
-
+from fastapi import UploadFile
 class TournamentService():
 
     def __init__(self, db: Session):
@@ -64,11 +64,27 @@ class TournamentService():
             
 
 
-    def create_tournament(self, tournament: Tournament):
+    def create_tournament(self, tournament: Tournament, image: UploadFile):
         t = TOURNAMENT(**tournament.dict())
+
+    # Save the image to the server or cloud storage
+        image_path = f"uploads/{shortuuid.uuid()}.jpg"  # Assuming JPEG format
+        with open(image_path, "wb") as img:
+            img.write(image.file.read())
+
+
+
+    # Update the tournament model with the image path
+        t.image = image_path
+
         t.id = shortuuid.uuid()[:16]
         self.db.add(t)
-        return GenericResponseModel(status='success', message='tournament created successfully', data=model_to_dict(t), status_code=http.HTTPStatus.CREATED)
+        return GenericResponseModel(
+            status='success',
+            message='tournament created successfully',
+            data=model_to_dict(t),
+            status_code=http.HTTPStatus.CREATED
+        )
     
 
     def update_tournament(self, tournament: Tournament, tournament_id: str, user_id: str) -> GenericResponseModel:

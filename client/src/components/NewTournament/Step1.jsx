@@ -47,6 +47,9 @@ const Step1 = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [token, setToken] = useState("");
   const [idParam, setIdParam] = useState("");
+  const [image, setImage] = useState(null);
+  const [imgData, setImgData] = useState(null);
+
 
   const handleOrganizationNameChange = (event) => {
     setOrganizationName(event.target.value);
@@ -188,9 +191,13 @@ const Step1 = () => {
         end_date: new Date(endDate).toISOString(),
         is_payment_done: true,
         payment_id: "",
+        image: image,
         is_active: true,
       };
       
+      // console.log('====================================');
+      // console.log(toSent);
+      // console.log('====================================');
       const response = await postRequest('organizer/tournament', toSent, token);
       setIdParam(response.data.id)
       toast.success('🦄 Congratulations!!!!!', {
@@ -223,23 +230,19 @@ const Step1 = () => {
 
   const isLoading = false;
 
-
-  const [image, setImage] = useState(null);
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
 
+    setImgData(file);
+    
     reader.onloadend = () => {
       setImage(reader.result);
     };
-
     if (file) {
       reader.readAsDataURL(file);
     }
   };
-
-
   return (
     <div className="w-full h-full">
                   <div className="w-full py-10">
@@ -290,7 +293,7 @@ const Step1 = () => {
         :
         (
           <>
-          <p className="text-sm mt-2">Upload file</p>
+          <p className="text-sm mt-2">Upload your image</p>
           </>
         )
       }

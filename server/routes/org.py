@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Query
 from models.index import ORGANIZERS, TOURNAMENT, TOURNAMENT_GAMES
 from schemas.index import Organizer, Tournament,GenericResponseModel, Tournament_Games, Umpires, Grounds, Winners, Losers
@@ -12,11 +13,9 @@ from service.tournament import TournamentService
 from service.tournament_games import Tournament_Game_Service
 import http
 from typing import List
-
-# from fastapi_pagination import LimitOffsetPage, Page
-# from fastapi_pagination.ext.sqlalchemy import paginate
-
-
+from fastapi import UploadFile, File
+from fastapi.responses import JSONResponse
+IMAGEDIR = "images/"
 #routes
 organizerRouter = APIRouter()
 
@@ -34,10 +33,32 @@ async def get_tournaments_of_organizer(page: int = Query(0, ge=0), limit: int = 
 
 
 @organizerRouter.post('/tournament')
-async def create_new_tournament(tournament: Tournament,user_id: str = Depends(get_current_user), db: Session = Depends(get_db))->GenericResponseModel:
-    response = TournamentService(db).create_tournament(tournament)
+async def create_new_tournament(
+    tournament: Tournament,
+    image: UploadFile = File(...),
+    user_id: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
+) -> GenericResponseModel:
+    response = TournamentService(db).create_tournament(tournament, image)
     db.commit()
     return response
+
+
+@organizerRouter.post("/files")
+async def upload_image(file: UploadFile = File(...)):
+    file.filename = f"{uuid.uuid4()}.jpg"
+    contents = await file.read()
+    
+    with open(f"{IMAGEDIR}{file.filename}", "wb") as image:
+        image.write(contents)
+    
+    # Construct the image URL
+    image_url = f"http://127.0.0.1:8000/{IMAGEDIR}{file.filename}"
+    
+    # Return the file as a response along with the image URL
+    return JSONResponse(content={"filename": file.filename, "image_url": image_url})
+
+
 
 @organizerRouter.patch('/tournament/{tournament_id}')
 async def update_tournament(tournament_id: str,user_id: str = Depends(get_current_user),tournament: dict={},  db: Session = Depends(get_db))->GenericResponseModel:

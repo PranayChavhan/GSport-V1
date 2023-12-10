@@ -15,7 +15,7 @@ import {
   patchRequest,
   getRequest
 } from "../../../api/api";
-
+import axios from "axios";
 
 function Success() {
   return (
@@ -52,8 +52,10 @@ const Step1Update = () => {
   const [token, setToken] = useState("");
   const [idParam, setIdParam] = useState("");
   const [tournamentData, setTournamentData] = useState(null);
-
-
+  const [imgData, setImgData] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imgName, setImgName] = useState("");
+  const [image, setImage] = useState(null);
   const handleOrganizationNameChange = (event) => {
     setOrganizationName(event.target.value);
   };
@@ -74,7 +76,7 @@ const Step1Update = () => {
  useEffect(() => {
     const fetchTournamentData = async () => {
       try {
-        const url = 'tournaments/DDbHeHy2rjuHuKb4';
+        const url = `tournaments/${id}`;
         const data = await getRequest(url);
         setTournamentData(data.data);
         setOrganizationName(data.data.organizer_name);
@@ -83,6 +85,7 @@ const Step1Update = () => {
         setTournamentDescription(data.data.about);
         setStartDate(new Date(data.data.start_date));
         setEndDate(new Date(data.data.end_date));
+        setImgName(data.data.image);
       } catch (error) {
         console.error('Error fetching tournament data:', error);
       }
@@ -125,6 +128,21 @@ const Step1Update = () => {
     }
   }, []);
 
+
+    const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(e.target.files[0]);
+    const reader = new FileReader();
+
+    setImgData(file);
+
+    reader.onloadend = () => {
+      setImage(reader.result);
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
 
   
   const handleProceed = async () => {
@@ -253,6 +271,29 @@ const Step1Update = () => {
 
   };
 
+    const handleUpload = async () => {
+    if (imgData) {
+      try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        // Adjust the URL based on your FastAPI server address
+        const apiUrl = "http://127.0.0.1:8000/organizer/files";
+
+        const response = await axios.post(apiUrl, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setImgName(response.data);
+        console.log("File uploaded successfully:", response.data);
+        // Handle success, e.g., update state or display a success message
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        // Handle error, e.g., display an error message
+      }
+    }
+  };
 
   const isLoading = false;
 
@@ -276,7 +317,63 @@ const Step1Update = () => {
       ) : (
         <div className="w-full space-y-4">
           <div className=" mt-2 md:mt-4 w-full sm:w-4/4 lg:w-full py-2 md:py-5 rounded-lg flex flex-col  justify-center items-center shadow-md">
-            <div className="flex flex-col gap-4 justify-between">
+           
+            <div className="grid grid-cols-6 gap-4">
+              <div className="col-start-1 col-end-3 justify-center items-center flex flex-col gap-4 mx-10">
+                <div className="flex flex-col items-center justify-center w-full h-full border-dashed border-[2px] border-gray-400 ">
+                  <div className="flex flex-col items-center mt-8">
+                    <label className="relative cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                      <div className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 px-4 rounded-lg">
+                        Browse
+                      </div>
+                    </label>
+                    {image ? (
+                      <img
+                        src={image}
+                        alt="Preview"
+                        className="w-[32rem] h-[28rem] rounded-md mt-4" // Adjust width and height as needed
+                      />
+                    ) : (
+                      <>
+                        <img
+                        src={`http://127.0.0.1:8000/organizer/images/${imgName}`}
+                        alt={organizationName}
+                        className="w-[32rem] h-[28rem] rounded-md mt-4" // Adjust width and height as needed
+                      />
+                      </>
+                    )}
+                  </div>
+
+                  <div></div>
+                </div>
+                {imgName ? (
+                  <>
+                    <button className="bg-green-500 text-white font-bold py-2 px-4  w-full rounded-lg">
+                      Uploaded
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleUpload}
+                      className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4  w-full rounded-lg"
+                    >
+                      Upload
+                    </button>
+                  </>
+                )}
+              </div>
+
+
+            
+           
+            <div className="flex flex-col gap-4 justify-between col-start-3 col-end-5">
               <div className="flex flex-col justify-start w-full ">
                 <p className=" text-blue-gray-700 text-2xl  md:text-3xl font-poppins font-bold ">
                   Organisational Details heh
@@ -376,6 +473,7 @@ const Step1Update = () => {
                   />
                 </div>
               </div>
+            </div>
             </div>
             <div className="flex justify-center mt-8">
               <Button

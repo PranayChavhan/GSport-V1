@@ -61,7 +61,10 @@ class TournamentService():
 
             return {'status': 'success', 'data': tournaments, 'message': 'Tournament details', 'status_code':http.HTTPStatus.OK}
         
-            
+        
+    def get_tournament_by(self):
+        tournament = self.db.query(TOURNAMENT)
+        return tournament
 
 
     def create_tournament(self, tournament: Tournament):

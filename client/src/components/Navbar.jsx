@@ -72,7 +72,7 @@ function ProfileMenu({ image }) {
     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
       <MenuHandler>
         <Button
-          size="lg"
+          size="sm"
           variant="text"
           color="orange"
           className="flex  items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
@@ -159,9 +159,9 @@ const Topbar = () => {
 
   return (
     <div>
-      <header className="text-gray-600 body-font border-[2px] h-[5rem]">
-        <div className="mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-          <Link
+      <header className="text-gray-700 shadow-sm body-font fixed top-5 rounded-2xl w-[95rem] text-sm">
+        <div className="mx-auto flex flex-wrap flex-col md:flex-row items-center py-1 bg-gray-50 rounded-lg">
+          {/* <Link
             to="/home"
             className={`flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0`}
           >
@@ -178,27 +178,27 @@ const Topbar = () => {
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
             <span className="ml-3 text-xl">GSort</span>
-          </Link>
-          <nav className="md:ml-auto md:mr-auto flex gap-8 flex-wrap items-center text-base justify-center">
+          </Link> */}
+          <nav className="md:ml-auto md:mr-auto flex gap-8 flex-wrap items-center text-sm justify-center">
             <Link
-              to="home"
-              className={`mr-5 hover:text-orange-500 cursor-pointer ${
+              to="/user/home"
+              className={`mr-4 hover:text-orange-500 cursor-pointer ${
                 location.pathname === "/user/home" ? "text-orange-500" : ""
               }`}
             >
               Home
             </Link>
             <Link
-              to="aboutus"
-              className={`mr-5 hover:text-orange-500 cursor-pointer ${
+              to="/user/aboutus"
+              className={`mr-4 hover:text-orange-500 cursor-pointer ${
                 location.pathname === "/user/aboutus" ? "text-orange-500" : ""
               }`}
             >
               About us
             </Link>
             <Link
-              to="features"
-              className={`mr-5 hover:text-orange-500 cursor-pointer ${
+              to="/user/features"
+              className={`mr-4 hover:text-orange-500 cursor-pointer ${
                 location.pathname === "/user/features"
                   ? "text-orange-500"
                   : ""
@@ -207,15 +207,20 @@ const Topbar = () => {
               Features
             </Link>
             <Link
-              to="blogs"
-              className={`mr-5 hover:text-orange-500 cursor-pointer ${
+              to="/user/blogs"
+              className={`mr-4 hover:text-orange-500 cursor-pointer ${
                 location.pathname === "/user/blogs" ? "text-orange-500" : ""
               }`}
             >
               Blog
             </Link>
           </nav>
-          <div>
+          <div className="flex flex-row items-center gap-4">
+            <div>
+              <Link to="/organizer/new-tournament/step1" className="border p-2 text-sm rounded-full bg-gray-100 px-4 hover:bg-gray-200">
+                Host Tournament
+              </Link>
+            </div>
             {profileUrl ? (
               <div>
                 <ProfileMenu image={profileUrl} />
@@ -224,7 +229,7 @@ const Topbar = () => {
               <div>
                 <button
                   onClick={handleLogout}
-                  className="inline-flex mr-4 items-center bg-gray-700 border-0 py-2 px-6 focus:outline-none hover:bg-gray-900 text-white rounded text-base mt-4 md:mt-0"
+                  className="inline-flex mr-4 items-center bg-gray-700 border-0 py-1 px-4 focus:outline-none hover:bg-gray-900 text-white rounded text-base mt-4 md:mt-0"
                 >
                   Sign in
                 </button>

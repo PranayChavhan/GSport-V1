@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { Button, Carousel, IconButton, Card,
   CardHeader,
@@ -20,59 +20,17 @@ import { FiFilter } from "react-icons/fi";
 import { IoMdOptions } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import {
+  getRequest
+} from "../../api/api";
 
 
-const TABS = [
-  {
-    label: "New",
-    value: "New",
-  },
-  {
-    label: "In Progress",
-    value: "Progress",
-  },
-  {
-    label: "Completed",
-    value: "Completed",
-  },
-];
+
+
  
-const TABLE_HEAD = ["Organization","Start Date", "Due Date", "Team"];
- 
-const TABLE_ROWS = [
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-    org: "PICT Sports club",
-    tournament: "Elevate 2.0",
-    priority: "low",
-    date: "23/04/2018",
-    progress: 70,
-    role: "Admin",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-2.jpg",
-    org: "College : VIT",
-    tournament: "Inter College Sports",
-    priority: "high",
-    date: "23/04/2018",
-    progress: 60,
-    role: "Admin",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-1.jpg",
-    org: "IIT Bombay",
-    tournament: "Inter college Athlethon",
-    priority: "medium",
-    date: "19/09/2017",
-    progress: 80,
-    role: "Organizer",
-  }
-];
-
+const TABLE_HEAD = ["Tournaments","Start Date", "Due Date", "Team", "Edit"];
 
 function Team() {
-  
-
   return (
       <div className="flex items-center -space-x-4">
         <Avatar
@@ -109,9 +67,33 @@ function Team() {
 
 
 const OTournamentTracking = () => {
+
+  const [tournament, setTournament] = useState([]);
+
+
+  useEffect(() => {
+    const fetchTournamentData = async () => {
+      try {
+        const url = 'tournaments/getalltournament';
+        const data = await getRequest(url);
+
+        setTournament(data)
+        
+      } catch (error) {
+        console.error('Error fetching tournament data:', error);
+      }
+    };
+    fetchTournamentData();
+  }, []);
+
+
+  console.log('====================================');
+  console.log(tournament);
+  console.log('====================================');
+  
   const cards = [
     {
-      label: "New",
+      label: "Upcomming Tournaments",
       value: "1",
       desc: "+1 from yesterday",
       iconBg: "bg-blue-500",
@@ -140,47 +122,24 @@ const OTournamentTracking = () => {
   const [dueDate, setDueDate] = useState(null);
 
   return (
-    <div className="w-full flex flex-col gap-5 ">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
-        <p className="text-2xl md:text-2xl font-bold text-blue-gray-700">
-          Tournaments Tracking
-        </p>
-        <Link
-          to={"/organizer/new-tournament/step1"}
-        >
-          <Button
-            color="orange"
-            size="md"
-            className="flex justify-between items-center w-full"
-          >
-            <BiPlus className="w-8 h-8" />
-            <p className="text-md"> New Tournament</p>
-          </Button>
-        </Link>
-        <div className="xl:hidden items-center justify-center">
-          <Link
-            to={"/o/new-tournament/step1"}
-            className="w-full flex items-center justify-center"
-          >
-            <Button
-              color="orange"
-              size="sm"
-              className="w-full flex justify-center items-center"
-            >
-              <BiPlus className="w-8 h-8" />
-              <p className="text-md"> New Tournament</p>
-            </Button>
-          </Link>
-        </div>
-      </div>
+    <div className="w-full min-h-screen flex flex-col gap-5 ">
+     
+     <section className="text-gray-600 body-font my-10 mr-6">
+  <div className="">
+    <div className=" flex flex-col sm:flex-row sm:items-center items-start mx-auto">
+      <h1 className="flex-grow sm:pr-16 text-2xl font-medium title-font text-gray-900">Slow-carb next level shoindxgoitch ethical authentic, scenester sriracha forage.</h1>
+      <button className="flex-shrink-0 shadow-sm text-white bg-orange-500 border-0 py-2 px-8 focus:outline-none hover:bg-yellow-600 rounded-md text-lg mt-10 sm:mt-0">New Tournament</button>
+    </div>
+  </div>
+</section>
 
       <div className="w-full h-full flex flex-col-reverse md:flex-row gap-5">
-        <div className="w-full h-full gap-4 flex flex-col xl:pr-4 border-r-2">
+        <div className="w-full h-full gap-4 flex flex-col xl:pr-4 ">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 flex-grow">
             {cards.map((card, index) => (
               <div
                 key={index}
-                className={`p-5 ${card.bgColor} rounded-lg space-y-5 shadow-md`}
+                className={`p-5 bg-white rounded-lg h-[17rem] space-y-5 shadow-sm`}
               >
                 <div className="flex flex-row justify-between items-center">
                   <p className={`text-md font-bold text-blue-gray-700`}>
@@ -206,68 +165,16 @@ const OTournamentTracking = () => {
             ))}
           </div>
           <div>
-            <div className="w-full flex justify-between ">
-              <p className="text-xl md:text-2xl font-bold text-blue-gray-700">
-                Tournament details
-              </p>
-              <div className="flex space-x-4 text-blue-gray-700">
-                <IconButton
-                  className="cursor-pointer bg-gray-200 text-blue-gray-700 p-2"
-                  size="sm"
-                >
-                  <IoMdOptions
-                    className="w-7 h-7 p-1 rounded-md"
-                    onClick={() => {}}
-                  />
-                </IconButton>
-                <IconButton
-                  className="cursor-pointer bg-gray-200 text-blue-gray-700 p-2"
-                  size="sm"
-                >
-                  <FaBoxes
-                    className="w-7 h-7 bg-gray-200 p-1 rounded-md"
-                    onClick={() => {}}
-                  />
-                </IconButton>
-                <IconButton
-                  className="cursor-pointer bg-gray-200 text-blue-gray-700 p-2"
-                  size="sm"
-                >
-                  <FiFilter
-                    className="w-7 h-7 bg-gray-200 p-2 rounded-md"
-                    onClick={() => {}}
-                  />
-                </IconButton>
-              </div>
-            </div>
+        
 
             <div className="scroll-smooth">
               
 
-
+{/* 
             <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row z-50">
-          <Tabs value="all" className="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 xl:w-2/5 z-0">
-            <TabsHeader className="">
-              {TABS.map(({ label, value }) => (
-                <Tab key={value} value={value} className="text-xs md:text-md">
-                  {label}
-                </Tab>
-              ))}
-            </TabsHeader>
-          </Tabs>
-          <div className="text-sm z-50  rounded-lg flex justify-center items-center gap-2">
-                <p className="text-xs ">Sort by: Due date</p>
-                <input 
-                    type="date"
-                    selected={dueDate}
-                    onChange={(date) => setDueDate(date)}
-                    id="birthday"
-                    name="birthday" 
-                    className=" px-4 py-2 z-50 rounded-lg border focus:outline-none  focus:border-orange-500 focus:ring-2 focus:ring-orange-200 text-xs md:text-normal"
-                />
-            </div>
+         <p className='font-normal text-gray-900'>Ongoing Tournaments</p>
         </div>
       </CardHeader>
       <CardBody className="overflow-scroll px-0">
@@ -288,25 +195,25 @@ const OTournamentTracking = () => {
             </tr>
           </thead>
           <tbody>
-          {TABLE_ROWS.map((row, index) => (
+          {tournament.map((row, index) => (
           <tr
             key={index}
             className="hover:bg-gray-100 transition-all cursor-pointer"
-            onClick={() => navigate(`/organizer/new-tournament/step1`)}
+            onClick={() => navigate(`/organizer/new-tournament/step1/${row.id}`)}
           >
             <td className="py-4 px-4 border-b">
               <div className="flex items-center gap-3">
-                <Avatar src={row.img} alt={row.org} size="sm" className='mr-8' />
+                <Avatar src={`http://127.0.0.1:8000/organizer/images/${row.image}`} alt={row.name} size="sm" className='mr-8' />
                 <div className="flex flex-col">
                   <Typography variant="large" color="blue-gray" className="font-bold">
-                    {row.tournament}
+                    {row.name}
                   </Typography>
                   <Typography
                     variant="small"
                     color="blue-gray"
                     className="font-normal opacity-70"
                   >
-                    {row.org}
+                    {row.organizer_name}
                   </Typography>
                 </div>
               </div>
@@ -314,50 +221,106 @@ const OTournamentTracking = () => {
             <td className='border-b'>
               <Typography variant="small" color="blue-gray" className="font-normal flex items-center space-x-3">
                 <BiCalendarAlt />
-                <p>{row.date}</p>
+                <p>{row.start_date}</p>
               </Typography>
             </td>
             <td className='border-b'>
               <Typography variant="small" color="blue-gray" className="font-normal flex items-center space-x-3">
                 <BiCalendarAlt />
-                <p>{row.date}</p>
+                <p>{row.end_date}</p>
               </Typography>
             </td>
+            
+
             <td className='border-b'>
               <Typography variant="small" color="blue-gray" className="font-normal">
                 <Team />
               </Typography>
             </td>
+
+            <td className='border-b'>
+              <Typography variant="small" color="blue-gray" className="font-normal flex items-center ml-4">
+                <p>{row.organizer_name}</p>
+              </Typography>
+            </td>
+
+
           </tr>
         ))}
             
           </tbody>
         </table>
       </CardBody>
-      <CardFooter className="flex items-center justify-between border-blue-gray-50 p-4">
-        <Typography variant="small" color="blue-gray" className="font-normal">
-          Page 1 of 10
-        </Typography>
-        <div className="flex gap-2">
-          <Button variant="outlined" color="blue-gray" size="sm">
-            Previous
-          </Button>
-          <Button variant="outlined" color="blue-gray" size="sm">
-            Next
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
+     
+    </Card> */}
  
 
 
 
+ <div className=''>
+      
+
+      <section className="text-gray-600 body-font mt-12 h-screen">
+  <div className="">
+    <div className="flex flex-wrap w-full mb-14">
+      <div className="lg:w-1/2 w-full ">
+        <h1 className="sm:text-3xl text-2xl font-medium title-font text-gray-900">Ongoing Tournament</h1>
+        <div className="h-1 w-20 bg-yellow-500 rounded"></div>
+      </div>
+    
+    </div>
+    <div className="flex flex-wrap -m-4">
+      <div className="xl:w-1/4 md:w-1/2 p-4">
+        <div className="bg-white p-6 shadow-md rounded-lg">
+          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/720x400" alt="content"/>
+          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
+          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">Chichen Itza</h2>
+          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
+        </div>
+      </div>
+      <div className="xl:w-1/4 md:w-1/2 p-4">
+        <div className="bg-white p-6 shadow-md rounded-lg">
+          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/721x401" alt="content"/>
+          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
+          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">Colosseum Roma</h2>
+          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
+        </div>
+      </div>
+      <div className="xl:w-1/4 md:w-1/2 p-4">
+        <div className="bg-white p-6 shadow-md rounded-lg">
+          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/722x402" alt="content"/>
+          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
+          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">Great Pyramid of Giza</h2>
+          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
+        </div>
+      </div>
+      <div className="xl:w-1/4 md:w-1/2 p-4">
+        <div className="bg-white p-6 shadow-md rounded-lg">
+          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/723x403" alt="content"/>
+          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
+          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">San Francisco</h2>
+          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>
+  
+  
+  
+    </div>
 
 
             </div>
           </div>
         </div>
       </div>
+
+
+
+
+
+    
     </div>
   );
 };

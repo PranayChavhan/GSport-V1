@@ -23,6 +23,7 @@ class Organizer(BaseModel):
     password: str
 
 class Tournament(BaseModel):
+    id:str
     name: str
     about: str
     organizer_id: str

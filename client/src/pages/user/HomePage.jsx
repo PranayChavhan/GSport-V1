@@ -17,7 +17,7 @@ import { Link } from "react-router-dom";
 
 const HomePage = () => {
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-gray-100 min-h-screen">
       
       
     <div className="container mx-auto mt-16 px-4 flex flex-col items-center">

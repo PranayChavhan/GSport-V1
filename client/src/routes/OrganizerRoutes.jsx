@@ -10,8 +10,9 @@ import NewTournament from "../pages/organizer/NewTournament"
 import OCalendar from "../pages/organizer/OCalendar"
 import ODashboard from "../pages/organizer/ODashboard"
 import OMessages from "../pages/organizer/OMessages"
-import OTeams from "../pages/organizer/OTeams"
+import ORegistration from "../pages/organizer/ORegistration"
 import OTournamentTracking from "../pages/organizer/OTournamentTracking"
+import OWishlist from "../pages/organizer/OWishlist"
 
 
 export const OrganizerRoutes = {
@@ -33,8 +34,12 @@ export const OrganizerRoutes = {
             element: <OMessages/>,
         },
         { 
-            path: "teams",
-            element: <OTeams/>,
+          path: "wishlist",
+          element: <OWishlist/>,
+      },
+        { 
+            path: "registration",
+            element: <ORegistration/>,
         },
         { 
             path: "tournament-tracking",

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { AiOutlineClose } from "react-icons/ai";
 import {
   Card,
@@ -13,8 +14,7 @@ import {
   FolderIcon,
   InboxIcon,
 } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
-// import { ChevronRightIcon, XIcon } from '@heroicons/react/outline';
+import { Link, useParams, useLocation } from "react-router-dom";
 
 const sidebarItems = [
   {
@@ -30,78 +30,89 @@ const sidebarItems = [
     hasSuffix: false,
   },
   {
-    linkTo: "tournament-tracking",
-    icon: FolderIcon,
-    label: "Tournament Tracking",
+    linkTo: "registration",
+    icon: UsersIcon,
+    label: "Registrations",
     hasSuffix: false,
   },
   {
-    linkTo: "teams",
-    icon: UsersIcon,
-    label: "Teams",
+    linkTo: "wishlist",
+    icon: InboxIcon,
+    label: "Wishlist",
+    hasSuffix: false,
+  },
+  {
+    linkTo: "tournament-tracking",
+    icon: FolderIcon,
+    label: "Manage Listings",
     hasSuffix: false,
   },
   {
     linkTo: "messages",
     icon: InboxIcon,
-    label: "Messages",
-    hasSuffix: true,
+    label: "Settigngs",
+    hasSuffix: false,
   },
 ];
 
 // eslint-disable-next-line react/prop-types
-function SidebarItems (){
-  return (
-    <Card
-        className={`bg-white shadow-xl md:shadow-none h-full mt-2`}
-      > 
-        {sidebarItems.map((item, key) => (
-          <div key={key} >
-            <Link  to={item.linkTo}>
-              <ListItem 
-                className={`group pl-6 w-full rounded-none py-4 focus:bg-orange-50 focus:text-orange-500 hover:bg-orange-50 hover:text-orange-500 `}
-              >
-                <ListItemPrefix>
-                  <item.icon className="h-5 w-5 group-hover:scale-105 group-hover:translate-x-1 transition-transform duration-200 ease-in" />
-                </ListItemPrefix>
-                <p className=" text-blue-gray-700 group-hover:translate-x-1 transition-transform duration-200 ease-in">{item.label}</p>
-                {item.hasSuffix && (
-                  <ListItemSuffix >
-                    <Chip
-                        value="14"
-                        size="sm"
-                        variant="ghost"
-                        color="orange"
-                        className={`${!open && "scale-0"} rounded-full`}
-                      />
-                  </ListItemSuffix>
-                )}
-              </ListItem>
-            </Link>
-            </div>
-        ))}
-      </Card>
+function SidebarItems() {
+  let { id } = useParams();
+  const location = useLocation();
 
-  )
+  return (
+    <Card className={`bg-gray-100 border border-gray-300 shadow-lg p-4 h-[55rem] mt-2 text-sm`}>
+      {sidebarItems.map((item, key) => (
+        <div key={key}>
+          <Link to={item.linkTo}>
+            <ListItem
+              className={`group pl-6 px-10 pt-10 mb-2 rounded-xl py-4 ${
+                location.pathname.includes(item.linkTo)
+                  ? "bg-orange-400 text-black"
+                  : "focus:bg-orange-400 focus:text-black hover:bg-orange-50 hover:text-orange-500"
+              }`}
+            >
+              <ListItemPrefix>
+                <item.icon className="h-5 w-5 " />
+              </ListItemPrefix>
+              <p className=" text-blue-gray-700">{item.label}</p>
+              {item.hasSuffix && (
+                <ListItemSuffix>
+                  <Chip
+                    value="14"
+                    size="sm"
+                    variant="ghost"
+                    color="orange"
+                    className={`${!open && "scale-0"} rounded-full`}
+                  />
+                </ListItemSuffix>
+              )}
+            </ListItem>
+          </Link>
+        </div>
+      ))}
+    </Card>
+  );
 }
 
 const Sidebar = () => {
-const isOpen = false;
+  const isOpen = true;
+
   return (
-      <div
-        className={`${
-          isOpen ? "w-80 fixed top-0 h-full md:block" : "hidden md:sticky h-full"
-        } w-80 md:w-64 md:inline-block md:top-0 bg-white border-r-2`}
-      >
-        {/* Content div starts */}
-        <div className="md:hidden relative p-4">
-          <AiOutlineClose className="absolute top-5 right-9" />
-        </div>
-        <div className="pt-4 md:pt-0 ">
-          <SidebarItems />
-        </div>
-        {/* Content div ends */}
+    <div
+      className={`${
+        isOpen ? " fixed top-0 h-full md:block" : "hidden md:sticky h-full"
+      } w-[20rem] md:inline-block md:top-0 mx-5 my-3 `}
+    >
+      {/* Content div starts */}
+      <div className="md:hidden relative p-4">
+        <AiOutlineClose className="absolute top-5 right-9" />
       </div>
+      <div className="pt-4 md:pt-0 ">
+        <SidebarItems />
+      </div>
+      {/* Content div ends */}
+    </div>
   );
 };
 

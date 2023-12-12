@@ -25,7 +25,7 @@ const Step3 = () => {
   let { id } = useParams();
   return (
 
-    <div className='w-full flex flex-col gap-4'>
+    <div className='w-full flex flex-col gap-4 bg-white shadow-md rounded-lg py-5 px-4'>
      <div className="w-full">
         <CustomizedSteppers step={2}/>
      </div>

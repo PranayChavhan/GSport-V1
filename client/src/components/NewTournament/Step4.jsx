@@ -124,7 +124,7 @@ const Step4 = () => {
 
     return (
 
-      <div className="w-full flex flex-col justify-center items-center gap-4">
+      <div className="w-full flex flex-col justify-center items-center gap-4 bg-white shadow-md rounded-lg py-5 px-4">
         <div className="w-full">
           <CustomizedSteppers step={3}/>
         </div>
@@ -143,7 +143,7 @@ const Step4 = () => {
         (
           <>
                 <section className="text-gray-600 body-font overflow-hidden">
-  <div className="container px-5 mx-auto">
+  <div className="container px-5 mx-auto border border-gray-300 rounded-lg py-14 my-4">
     <div className="flex flex-col text-center w-full  ">
       <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Pricing</h1>
       <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-gray-500">Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical.</p>

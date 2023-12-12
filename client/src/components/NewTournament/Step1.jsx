@@ -191,6 +191,7 @@ const Step1 = () => {
 
     try {
       const toSent = {
+        id:"",
         name: tournamentName,
         about: tournamentDescription,
         organizer_id: id,
@@ -259,7 +260,7 @@ const Step1 = () => {
   const isLoading = false;
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full  bg-white shadow-md rounded-lg">
       <div className="w-full py-10">
         <CustomizedSteppers step={0} />
       </div>

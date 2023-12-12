@@ -161,29 +161,12 @@ const Topbar = () => {
     <div>
       <header className="text-gray-700 shadow-sm body-font fixed top-5 rounded-2xl w-[95rem] text-sm">
         <div className="mx-auto flex flex-wrap flex-col md:flex-row items-center py-1 bg-gray-50 rounded-lg">
-          {/* <Link
-            to="/home"
-            className={`flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </svg>
-            <span className="ml-3 text-xl">GSort</span>
-          </Link> */}
+         
           <nav className="md:ml-auto md:mr-auto flex gap-8 flex-wrap items-center text-sm justify-center">
             <Link
               to="/user/home"
-              className={`mr-4 hover:text-orange-500 cursor-pointer ${
-                location.pathname === "/user/home" ? "text-orange-500" : ""
+              className={`mr-4 hover:text-orange-500  cursor-pointer ${
+                location.pathname === "/user/home" ? "text-orange-500 border-b-2 border-orange-500" : ""
               }`}
             >
               Home
@@ -191,7 +174,7 @@ const Topbar = () => {
             <Link
               to="/user/aboutus"
               className={`mr-4 hover:text-orange-500 cursor-pointer ${
-                location.pathname === "/user/aboutus" ? "text-orange-500" : ""
+                location.pathname === "/user/aboutus" ? "text-orange-500 border-b-2 border-orange-500" : ""
               }`}
             >
               About us
@@ -200,7 +183,7 @@ const Topbar = () => {
               to="/user/features"
               className={`mr-4 hover:text-orange-500 cursor-pointer ${
                 location.pathname === "/user/features"
-                  ? "text-orange-500"
+                  ? "text-orange-500 border-b-2 border-orange-500"
                   : ""
               }`}
             >
@@ -209,7 +192,7 @@ const Topbar = () => {
             <Link
               to="/user/blogs"
               className={`mr-4 hover:text-orange-500 cursor-pointer ${
-                location.pathname === "/user/blogs" ? "text-orange-500" : ""
+                location.pathname === "/user/blogs" ? "text-orange-500 border-b-2 border-orange-500" : ""
               }`}
             >
               Blog

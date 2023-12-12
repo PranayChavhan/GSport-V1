@@ -298,7 +298,7 @@ const Step1Update = () => {
   const isLoading = false;
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full bg-white shadow-md rounded-lg">
                   <div className="w-full py-10">
             <CustomizedSteppers step={0} />
           </div>
@@ -316,7 +316,7 @@ const Step1Update = () => {
         </>
       ) : (
         <div className="w-full space-y-4">
-          <div className=" mt-2 md:mt-4 w-full sm:w-4/4 lg:w-full py-2 md:py-5 rounded-lg flex flex-col  justify-center items-center shadow-md">
+          <div className=" mt-2 md:mt-4 w-full sm:w-4/4 lg:w-full py-2 md:py-5 rounded-lg flex flex-col  justify-center items-center">
            
             <div className="grid grid-cols-6 gap-4">
               <div className="col-start-1 col-end-3 justify-center items-center flex flex-col gap-4 mx-10">

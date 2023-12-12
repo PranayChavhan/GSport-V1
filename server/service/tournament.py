@@ -104,6 +104,14 @@ class TournamentService():
         return {'status': 'success', 'data': tournament, 'message': 'Tournament details found', 'status_code':http.HTTPStatus.ACCEPTED}
 
 
+    def get_tournament_by_userid(self, user_id: str):
+        tournament = self.db.query(TOURNAMENT).filter(TOURNAMENT.organizer_id == user_id).all()
+        
+        if tournament is None:
+            return GenericResponseModel(status='error', message='Tournament not found or invalid data', status_code=http.HTTPStatus.BAD_REQUEST)
+        return {'status': 'success', 'data': tournament, 'message': 'Tournament details found', 'status_code':http.HTTPStatus.ACCEPTED}
+
+
     def get_tournament_games(self, tournament_id: str):
         games = self.db.query(TOURNAMENT_GAMES).filter(TOURNAMENT_GAMES.tournament_id==tournament_id).all()
         g_list = [model_to_dict(g) for g in games]

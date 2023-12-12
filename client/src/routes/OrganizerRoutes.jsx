@@ -4,15 +4,22 @@ import Step3 from "../components/NewTournament/Step3"
 import Step4 from "../components/NewTournament/Step4"
 import Step5 from "../components/NewTournament/Step5"
 import Step1Update from "../components/NewTournament/Updatable/Step1Update"
+import PlayerDetails from "../components/Registration/PlayerDetails"
 import ErrorPage from "../error-page"
 import Organizers from "../layout/Organizers"
+import Earnings from "../pages/organizer/Earnings"
 import NewTournament from "../pages/organizer/NewTournament"
 import OCalendar from "../pages/organizer/OCalendar"
 import ODashboard from "../pages/organizer/ODashboard"
 import OMessages from "../pages/organizer/OMessages"
 import ORegistration from "../pages/organizer/ORegistration"
+import OrgDetails from "../pages/organizer/OrgDetails"
 import OTournamentTracking from "../pages/organizer/OTournamentTracking"
 import OWishlist from "../pages/organizer/OWishlist"
+import RegistrationProcess from "../pages/organizer/RegistrationProcess"
+import TournamentDetail from "../pages/organizer/TournamentDetail"
+import YourOrg from "../pages/organizer/YourOrg"
+import YourTour from "../pages/organizer/YourTour"
 
 
 export const OrganizerRoutes = {
@@ -36,15 +43,45 @@ export const OrganizerRoutes = {
         { 
           path: "wishlist",
           element: <OWishlist/>,
-      },
+        },
         { 
             path: "registration",
             element: <ORegistration/>,
         },
         { 
+          path: "total-earning",
+          element: <Earnings/>,
+        },
+        { 
+          path: "your-organizations",
+          element: <YourOrg/>
+        },
+
+        { 
+          path: "your-tournaments",
+          element: <YourTour/>
+        },
+
+        { 
+          path: "organization-details/:id",
+          element: <OrgDetails/>
+        },
+        { 
+          path: "tournament-details/:id",
+          element: <TournamentDetail/>
+        },
+        { 
             path: "tournament-tracking",
             element: <OTournamentTracking/>,
         },
+        { 
+          path: "register",
+          element: <RegistrationProcess/>,
+      },
+      { 
+        path: "player-details",
+        element: <PlayerDetails/>,
+    },
         {
             path: "new-tournament/",
             element: <NewTournament/>,

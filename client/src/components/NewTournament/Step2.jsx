@@ -49,7 +49,7 @@ const Step2 = () => {
 
 
   return (
-    <div className="w-full h-full  gap-4 ">
+    <div className="w-full py-5 px-4 bg-white shadow-md rounded-lg  gap-4 ">
 
       <div className="w-full ">
         <CustomizedSteppers step={1} />
@@ -204,7 +204,7 @@ const Step2 = () => {
         </div>
       </div>
 
-      <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4 ">
+      <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4  mt-28">
         <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step1/${id}`)} >
           Prev
         </Button>

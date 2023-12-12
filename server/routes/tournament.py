@@ -39,6 +39,12 @@ async def get_all_tournaments(
 async def get_tournament_by_id(tournament_id: str, db: Session=Depends(get_db)):
     return TournamentService(db).get_tournament_by_id(tournament_id)
 
+
+@tournamentRouter.get('/userid/{user_id}')
+async def get_tournament_by_userid(user_id: str, db: Session=Depends(get_db)):
+    return TournamentService(db).get_tournament_by_userid(user_id)
+
+
 @tournamentRouter.get('/{tournament_id}/games')
 async def get_tournament_games(tournament_id: str,user_id: str = Depends(get_current_user),  db: Session = Depends(get_db))->GenericResponseModel:
     response = TournamentService(db).get_tournament_games(tournament_id)

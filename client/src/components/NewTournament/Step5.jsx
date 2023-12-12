@@ -78,7 +78,7 @@ export default function Step5() {
 
   
   return (
-    <div className="w-full flex flex-col h-full mt-2 gap-2 lg:gap-8 ">
+    <div className="w-full flex flex-col py-5 px-4 mt-2 gap-2 lg:gap-8 bg-white shadow-md rounded-lg">
       <div className="w-full">
         <CustomizedSteppers step={4}/>
       </div>

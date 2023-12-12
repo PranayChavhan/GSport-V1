@@ -85,41 +85,65 @@ const OTournamentTracking = () => {
     };
     fetchTournamentData();
   }, []);
-
-
-  console.log('====================================');
-  console.log(tournament);
-  console.log('====================================');
-  
   const cards = [
     {
-      label: "Upcomming Tournaments",
-      value: "1",
+      label: "Total Earnings",
+      value: "$1500",
       desc: "+1 from yesterday",
       iconBg: "bg-blue-500",
       bgColor: "bg-blue-50",
       textColor: "text-blue-500",
+      linkTo: "/organizer/total-earning"
     },
     {
-      label: "In Progress",
-      value: "3",
+      label: "Organizations",
+      value: "6",
       desc: "",
       iconBg: "bg-red-500",
       bgColor: "bg-red-50",
       textColor: "text-red-500",
+      linkTo: "/organizer/your-organizations"
     },
     {
-      label: "Completed",
-      value: "16/20",
+      label: "Tournaments",
+      value: "16",
       desc: "+2 from yesterday",
       iconBg: "bg-light-blue-500",
       bgColor: "bg-light-blue-50",
       textColor: "text-light-blue-500",
+      linkTo: "/organizer/your-tournaments"
     },
   ];
   const navigate = useNavigate();
     
-  const [dueDate, setDueDate] = useState(null);
+  const [userData, setUserData] = useState("");
+  const [org, setOrg] = useState([]);
+
+  useEffect(() => {
+    const userDataString = localStorage.getItem("userData");
+    if (userDataString) {
+      try {
+        const userDataObject = JSON.parse(userDataString);
+        setUserData(userDataObject);
+      } catch (error) {
+        console.error("Error parsing userData:", error);
+      }
+    }
+  }, []);
+
+  
+  useEffect(() => {
+    const fetchTournamentData = async () => {
+      try {
+        const url = `tournaments/userid/${userData.id}`;
+        const data = await getRequest(url);
+        setOrg(data.data);
+      } catch (error) {
+        console.error("Error fetching tournament data:", error);
+      }
+    };
+    fetchTournamentData();
+  }, [userData.id]);
 
   return (
     <div className="w-full min-h-screen flex flex-col gap-5 ">
@@ -127,8 +151,10 @@ const OTournamentTracking = () => {
      <section className="text-gray-600 body-font my-10 mr-6">
   <div className="">
     <div className=" flex flex-col sm:flex-row sm:items-center items-start mx-auto">
-      <h1 className="flex-grow sm:pr-16 text-2xl font-medium title-font text-gray-900">Slow-carb next level shoindxgoitch ethical authentic, scenester sriracha forage.</h1>
-      <button className="flex-shrink-0 shadow-sm text-white bg-orange-500 border-0 py-2 px-8 focus:outline-none hover:bg-yellow-600 rounded-md text-lg mt-10 sm:mt-0">New Tournament</button>
+      <h1 className="flex-grow sm:pr-16 text-2xl font-medium title-font text-gray-900">Elevate your sporting events with seamless tournament creation and management. <br></br>Let the games begin!  </h1>
+      
+      <Link to="/organizer/new-tournament/step1" className="flex-shrink-0 shadow-sm text-white bg-orange-500 border-0 py-2 px-8 focus:outline-none hover:bg-yellow-600 rounded-md text-lg mt-10 sm:mt-0">New Tournament</Link>
+    
     </div>
   </div>
 </section>
@@ -137,7 +163,8 @@ const OTournamentTracking = () => {
         <div className="w-full h-full gap-4 flex flex-col xl:pr-4 ">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 flex-grow">
             {cards.map((card, index) => (
-              <div
+              <Link
+              to = {`${card.linkTo}`}
                 key={index}
                 className={`p-5 bg-white rounded-lg h-[17rem] space-y-5 shadow-sm`}
               >
@@ -161,7 +188,7 @@ const OTournamentTracking = () => {
                   {card.value}
                 </p>
                 <p className="text-sm text-gray-700">{card.desc}</p>
-              </div>
+              </Link>
             ))}
           </div>
           <div>
@@ -270,38 +297,26 @@ const OTournamentTracking = () => {
     
     </div>
     <div className="flex flex-wrap -m-4">
-      <div className="xl:w-1/4 md:w-1/2 p-4">
-        <div className="bg-white p-6 shadow-md rounded-lg">
-          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/720x400" alt="content"/>
-          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
-          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">Chichen Itza</h2>
-          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
-        </div>
-      </div>
-      <div className="xl:w-1/4 md:w-1/2 p-4">
-        <div className="bg-white p-6 shadow-md rounded-lg">
-          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/721x401" alt="content"/>
-          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
-          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">Colosseum Roma</h2>
-          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
-        </div>
-      </div>
-      <div className="xl:w-1/4 md:w-1/2 p-4">
-        <div className="bg-white p-6 shadow-md rounded-lg">
-          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/722x402" alt="content"/>
-          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
-          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">Great Pyramid of Giza</h2>
-          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
-        </div>
-      </div>
-      <div className="xl:w-1/4 md:w-1/2 p-4">
-        <div className="bg-white p-6 shadow-md rounded-lg">
-          <img className="h-40 rounded w-full object-cover object-center mb-6" src="https://dummyimage.com/723x403" alt="content"/>
-          <h3 className="tracking-widest text-yellow-500 text-xs font-medium title-font">SUBTITLE</h3>
-          <h2 className="text-lg text-gray-900 font-medium title-font mb-4">San Francisco</h2>
-          <p className="leading-relaxed text-base">Fingerstache flexitarian street art 8-bit waistcoat. Distillery hexagon disrupt edison bulbche.</p>
-        </div>
-      </div>
+      {org.map((card, index) => (
+        <Link
+        to = {`/organizer/tournament-details/${card.id}`}
+         key={index} className="xl:w-1/4 md:w-1/2 p-4">
+          <div className="bg-white p-6 rounded-lg">
+            <img
+              className="h-40 rounded w-full object-cover object-center mb-6"
+              src={`http://127.0.0.1:8000/organizer/images/${card.image}`}
+              alt="content"
+            />
+            <h3 className="tracking-widest text-xs font-medium title-font">
+              {card.is_active ? <><p className="text-green-500">Active</p></> : <><p className="text-red-500">Closed</p></>}
+            </h3>
+            <h2 className="text-lg text-gray-900 font-medium title-font mb-4">
+              {card.organizer_name}
+            </h2>
+            <p className="leading-relaxed text-base">{card.about}</p>
+          </div>
+        </Link>
+      ))}
     </div>
   </div>
   </section>

@@ -60,10 +60,6 @@ const ODashboard = () => {
   }, []);
 
 
-  console.log('====================================');
-  console.log(org);
-  console.log('====================================');
-
   return (
     <div className="h-full bg-gray-100 min-h-screen w-full">
       

@@ -4,6 +4,8 @@ import Step3 from "../components/NewTournament/Step3"
 import Step4 from "../components/NewTournament/Step4"
 import Step5 from "../components/NewTournament/Step5"
 import Step1Update from "../components/NewTournament/Updatable/Step1Update"
+import AddMembers from "../components/Registration/AddMembers"
+import PaymentOfParticipation from "../components/Registration/PaymentOfParticipation"
 import PlayerDetails from "../components/Registration/PlayerDetails"
 import ErrorPage from "../error-page"
 import Organizers from "../layout/Organizers"
@@ -75,13 +77,24 @@ export const OrganizerRoutes = {
             element: <OTournamentTracking/>,
         },
         { 
-          path: "register",
+          path: "register/",
           element: <RegistrationProcess/>,
-      },
-      { 
-        path: "player-details",
-        element: <PlayerDetails/>,
-    },
+          children: [
+            { 
+              path: "player-details/:id",
+              element: <PlayerDetails/>,
+            },
+            { 
+              path: "payments/:id/:id",
+              element: <PaymentOfParticipation/>,
+            },
+            { 
+              path: "add-members/:id",
+              element: <AddMembers/>,
+            },
+          ]
+        },
+      
         {
             path: "new-tournament/",
             element: <NewTournament/>,

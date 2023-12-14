@@ -14,6 +14,8 @@ class USERS(Base):
     full_name = Column(String(255))
     email_id = Column(String(80), nullable=False, unique=True)
     phone_no = Column(String(20), nullable=False, unique=True)
+    college = Column(String(255), nullable=True)
+    address = Column(String(2550), nullable=True)
     password = Column(String(100), nullable=False)
     verified = Column(Integer, default=0)
     gender = Column(String(20), default=None)
@@ -126,8 +128,10 @@ class TEAMS(Base):
     tournament_game = relationship("TOURNAMENT_GAMES")
     # 0 denotes yet to verify 1(verified) -1(rejected)
     verified = Column(Integer, default=0)
+    payment_id = Column(String(100), nullable=True)
     no_of_boys = Column(Integer, nullable=False)
     no_of_girls = Column(Integer, nullable=False)
+    image = Column(String(255), nullable=True)
     # if tournament was type 2 that is league one
     # then 
     group = Column(Integer, nullable=None)

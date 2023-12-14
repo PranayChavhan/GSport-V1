@@ -22,10 +22,24 @@ async def fetch_all_players(db: Session = Depends(get_db)):
 # async def add_plays(game: str, user_id: str, db: Session = Depends(get_db)):
 #     pass
 
+
+
+
 @playersRouter.post('/create_team')
 async def join_game(team: Teams, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
     return TournamentService(db).create_team(team, user_id)
-    
+
+@playersRouter.patch('/create_team/{team_id}')
+async def update_team(
+    team_id: str,
+    user_id: str = Depends(get_current_user),
+    team: dict={},  
+    db: Session = Depends(get_db)
+    )->GenericResponseModel:
+    return TournamentService(db).update_team(team, team_id, user_id)
+
+
+
 @playersRouter.post('/join_team')
 async def join_team(team: Teams,  team_id: str, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
     return TournamentService(db).join_team(team, team_id, user_id)

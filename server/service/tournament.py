@@ -60,12 +60,23 @@ class TournamentService():
                 ).offset(page * limit).limit(limit).all()
 
             return {'status': 'success', 'data': tournaments, 'message': 'Tournament details', 'status_code':http.HTTPStatus.OK}
-        
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
     def get_tournament_by(self):
         tournament = self.db.query(TOURNAMENT)
         return tournament
 
+
+    def get_all_tournament(self):
+        data = self.db.query(TOURNAMENT).options(
+                joinedload(U_PAST_PARTICIPATION.tournament_game).options(
+                    joinedload(TOURNAMENT_GAMES.game),
+                    joinedload(TOURNAMENT_GAMES.tournament)
+                )
+            ).order_by(desc(TOURNAMENT.start_date)).all()
+        
+        return {'status': 'success', 'data': data, 'message': 'Previous participation', 'status_code':http.HTTPStatus.OK}
+        
 
     def create_tournament(self, tournament: Tournament):
         t = TOURNAMENT(**tournament.dict())
@@ -156,7 +167,7 @@ class TournamentService():
         
         user = self.db.query(USERS).options(load_only(USERS.gender, USERS.verified, USERS.dob)).filter(USERS.id==user_id).first()
         
-        if (tournament.open_to!=2 and tournament.open_to!=user.gender) or user.gender is None or user.dob is None:
+        if (tournament.open_to!=1 and tournament.open_to!=user.gender) or user.gender is None or user.dob is None:
             return GenericResponseModel(status='error', message='Tournament Game is not for your gender or update profile', status_code=http.HTTPStatus.BAD_REQUEST)
 
         if user.verified==0 or user.verified==-1:
@@ -203,7 +214,7 @@ class TournamentService():
 
         return True
 
-
+# =======================================================================================
     def create_team(self, team: Teams, user_id: str)->GenericResponseModel:
         checker_result = self.checker(team, user_id)
         if checker_result is not True:
@@ -219,7 +230,21 @@ class TournamentService():
         self.db.add(u_past_p_obj)
         self.db.commit()
 
-        return GenericResponseModel(status='success', message='Team created successfully', data={'team_id': team_id}, status_code=http.HTTPStatus.ACCEPTED)     
+        return GenericResponseModel(status='success', message='Team created successfully', data=team_id, status_code=http.HTTPStatus.ACCEPTED)     
+# =======================================================================================
+
+    def update_team(self, team: Teams, team_id: str, user_id: str) -> GenericResponseModel:
+        t = self.db.query(TEAMS).filter(and_(TEAMS.id == team_id)).first()
+
+        if t is None:
+            return GenericResponseModel(status='error', message='Tournament not found or invalid data', status_code=http.HTTPStatus.BAD_REQUEST)
+        for key, value in team.items():
+            setattr(t, key, value)
+        self.db.add(t)
+        self.db.commit()
+        return GenericResponseModel(status='success', message='Tournament details updated', status_code=http.HTTPStatus.ACCEPTED)
+
+
 
 
     def join_team(self, team: Teams, team_id: str, user_id: str):

@@ -30,7 +30,7 @@ async def get_all_tournaments(
     db: Session = Depends(get_db)
 ) -> List[Tournament]:
     tournament_service = TournamentService(db)
-    tournaments = tournament_service.get_tournament_by()
+    tournaments = tournament_service.get_all_tournament()
     return tournaments
 
 
@@ -46,7 +46,9 @@ async def get_tournament_by_userid(user_id: str, db: Session=Depends(get_db)):
 
 
 @tournamentRouter.get('/{tournament_id}/games')
-async def get_tournament_games(tournament_id: str,user_id: str = Depends(get_current_user),  db: Session = Depends(get_db))->GenericResponseModel:
+async def get_tournament_games(
+    tournament_id: str,  
+    db: Session = Depends(get_db))->GenericResponseModel:
     response = TournamentService(db).get_tournament_games(tournament_id)
     return response
 

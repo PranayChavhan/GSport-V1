@@ -4,7 +4,6 @@ import { getRequest } from "../../api/api";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card, Typography } from "@material-tailwind/react";
 import { FaUndoAlt } from "react-icons/fa";
-
 const TABLE_HEAD = ["Player", "Matches", "Win", "Loose", "Points"];
 
 const TABLE_ROWS = [
@@ -380,7 +379,7 @@ const TournamentDetail = () => {
         <div className="grid grid-cols-7 pt-10">
           <div className="col-start-1 col-end-5">
           <Link 
-          to="/organizer/player-details" 
+          to={`/organizer/register/player-details/${id}`}
           className="flex-shrink-0 ml-[21rem] shadow-sm text-white bg-orange-500 border-0 py-2 px-8 focus:outline-none hover:bg-yellow-600 rounded-md text-lg sm:mt-0">
             Register
             </Link>

@@ -16,15 +16,9 @@ class PLAYERS_Serivce():
 
     def get_previous_participation(self, user_id: str):
         data = self.db.query(U_PAST_PARTICIPATION).options(
-                joinedload(U_PAST_PARTICIPATION.tournament_game).load_only(
-                    TOURNAMENT_GAMES.name,TOURNAMENT_GAMES.info,TOURNAMENT_GAMES.start_date,TOURNAMENT_GAMES.end_date, TOURNAMENT_GAMES.game_id 
-                ).options(
-                    joinedload(TOURNAMENT_GAMES.game).load_only(
-                        GAMES.name
-                    ),
-                    joinedload(TOURNAMENT_GAMES.tournament).load_only(
-                        TOURNAMENT.organizer_name, TOURNAMENT.organizer_info,TOURNAMENT.name
-                    )
+                joinedload(U_PAST_PARTICIPATION.tournament_game).options(
+                    joinedload(TOURNAMENT_GAMES.game),
+                    joinedload(TOURNAMENT_GAMES.tournament)
                 )
             ).filter(U_PAST_PARTICIPATION.user_id==user_id).order_by(desc(U_PAST_PARTICIPATION.createdAt)).all()
         

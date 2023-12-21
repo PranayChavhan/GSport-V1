@@ -51,7 +51,7 @@ const ODashboard = () => {
       try {
         const url = `tournaments/getalltournament`;
         const data = await getRequest(url);
-        setOrg(data);
+        setOrg(data.data);
       } catch (error) {
         console.error("Error fetching tournament data:", error);
       }
@@ -59,6 +59,10 @@ const ODashboard = () => {
     fetchTournamentData();
   }, []);
 
+
+  // console.log('====================================');
+  // console.log(org[0].tournament_games[0].id);
+  // console.log('====================================');
 
   return (
     <div className="h-full bg-gray-100 min-h-screen w-full">

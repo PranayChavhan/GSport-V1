@@ -10,7 +10,7 @@ import { Button, Carousel, IconButton, Card,
   TabsHeader,
   Tab,
   Avatar,
-  CardFooter, } from "@material-tailwind/react";
+  } from "@material-tailwind/react";
   import { BiCalendarAlt } from "react-icons/bi";
 import { BiCheckCircle, BiPlay, BiPlus } from "react-icons/bi";
 import { HiDocumentText } from "react-icons/hi";

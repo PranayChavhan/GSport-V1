@@ -31,7 +31,7 @@ const ORegistration = () => {
         const url = `/players/previous_participation?token=${token}`;
         const data = await getRequest(url);
         setOrg(data.data);
-        console.log(data.data[0].tournament_game.tournament);
+        
       } catch (error) {
         console.error("Error fetching tournament data:", error);
       }

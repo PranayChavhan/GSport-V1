@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, Response
-from models.index import PLAYERS, DOCUMENTS, TEAMS, TEAM_PLAYERS, USERS
-from schemas.index import Player, Document, Login, Teams, TeamPlayers,GenericResponseModel
+from models.index import PLAYERS, DOCUMENTS, TEAMS, TEAM_PLAYERS, USERS, WISHLIST
+from schemas.index import Player, Document, Login, Teams, Wishlist, TeamPlayers,GenericResponseModel
 from sqlalchemy.orm import Session, joinedload, load_only
 from fastapi import Depends
 from config.db import get_db
@@ -41,15 +41,19 @@ async def update_team(
 
 
 @playersRouter.post('/join_team')
-async def join_team(team: Teams,  team_id: str, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
+async def join_team(
+    team: Teams,  
+    team_id: str, 
+    user_id: str=Depends(get_current_user), 
+    db: Session = Depends(get_db)):
     return TournamentService(db).join_team(team, team_id, user_id)
     
 @playersRouter.get('/team/{team_id}')
 async def get_team_by_id(team_id: str, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
     team = db.query(TEAMS).options(
-        load_only(TEAMS.admin_id, TEAMS.createdAt, TEAMS.no_of_boys, TEAMS.no_of_girls),
-        joinedload(TEAMS.admin).load_only(USERS.first_name, USERS.email_id, USERS.profile_url, USERS.last_name, USERS.dob, USERS.gender),
-        joinedload(TEAMS.team_players).load_only(TEAM_PLAYERS.id).joinedload(TEAM_PLAYERS.player).load_only(USERS.first_name, USERS.email_id, USERS.profile_url, USERS.last_name, USERS.dob, USERS.gender),
+        load_only(TEAMS.name, TEAMS.admin_id, TEAMS.tournament_game_id, TEAMS.image, TEAMS.matches, TEAMS.win, TEAMS.loose, TEAMS.points, TEAMS.createdAt),
+        joinedload(TEAMS.admin).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender, USERS.college),
+        joinedload(TEAMS.team_players).load_only(TEAM_PLAYERS.id).joinedload(TEAM_PLAYERS.player).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender),
     ).filter(TEAMS.id == team_id).first()
     if team is None:
         return GenericResponseModel(status='error', message='Invalid team id passed', status_code=http.HTTPStatus.BAD_REQUEST)
@@ -57,10 +61,45 @@ async def get_team_by_id(team_id: str, user_id: str=Depends(get_current_user), d
     return {'status': 'success', 'message': 'Team details', 'status_code': http.HTTPStatus.OK, 'data': team}
 
 
+@playersRouter.get('/team/tournament_id/{tournament_id}')
+async def get_team_by_id(tournament_id: str, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
+    team = db.query(TEAMS).options(
+        load_only(TEAMS.name, TEAMS.admin_id, TEAMS.tournament_game_id, TEAMS.image, TEAMS.matches, TEAMS.win, TEAMS.loose, TEAMS.points, TEAMS.createdAt),
+        joinedload(TEAMS.admin).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender, USERS.college),
+        joinedload(TEAMS.team_players).load_only(TEAM_PLAYERS.id).joinedload(TEAM_PLAYERS.player).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender),
+    ).filter(TEAMS.tournament_id == tournament_id).all()
+    if team is None:
+        return GenericResponseModel(status='error', message='Invalid team id passed', status_code=http.HTTPStatus.BAD_REQUEST)
+
+    return {'status': 'success', 'message': 'Team details', 'status_code': http.HTTPStatus.OK, 'data': team}
+
+
+
 @playersRouter.get('/previous_participation')
-async def get_previous_participation( user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_previous_participation(
+    user_id: str=Depends(get_current_user), 
+    db: Session = Depends(get_db)
+    ):
     response = PLAYERS_Serivce(db).get_previous_participation(user_id)
     return response
+
+
+@playersRouter.get('/get_wishlist')
+async def get_wishlist(
+    user_id: str=Depends(get_current_user), 
+    db: Session = Depends(get_db)
+    ):
+    response = PLAYERS_Serivce(db).get_wishlist(user_id)
+    return response
+
+
+
+@playersRouter.post("/add_to_wishlist", response_model=GenericResponseModel)
+def add_to_wishlist(wishlist: Wishlist, db: Session = Depends(get_db)):
+    wishlist_service = PLAYERS_Serivce(db)
+    result = wishlist_service.add_to_wishlist(wishlist)
+    return result
+
 
 
 # to check if user has any umpiring duty

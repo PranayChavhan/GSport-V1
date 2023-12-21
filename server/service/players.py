@@ -1,5 +1,5 @@
-from schemas.index import GenericResponseModel, Vtb
-from models.index import TEAMS,FIXTURES,TOURNAMENT,GAMES, U_PAST_PARTICIPATION,TOURNAMENT_GAMES,GROUNDS
+from schemas.index import GenericResponseModel, Vtb, Wishlist
+from models.index import TEAMS,FIXTURES,TOURNAMENT,GAMES, U_PAST_PARTICIPATION,TOURNAMENT_GAMES,GROUNDS, WISHLIST
 from sqlalchemy.orm import Session, joinedload, load_only
 from sqlalchemy import and_, or_, desc
 import shortuuid
@@ -14,6 +14,25 @@ class PLAYERS_Serivce():
         self.db = db
 
 
+    def add_to_wishlist(self, wishlist: Wishlist) -> GenericResponseModel:
+            wishlist_obj = WISHLIST(
+                user_id=wishlist.user_id,
+                tournament_id=wishlist.tournament_id
+            )
+            wishlist_obj.id = shortuuid.uuid()[:16]
+
+            self.db.add(wishlist_obj)
+            self.db.commit()
+
+            return GenericResponseModel(
+                status='success',
+                message='Item added to wishlist successfully',
+                data=wishlist_obj.id,
+                status_code=201
+            )
+    
+    
+    
     def get_previous_participation(self, user_id: str):
         data = self.db.query(U_PAST_PARTICIPATION).options(
                 joinedload(U_PAST_PARTICIPATION.tournament_game).options(
@@ -24,7 +43,17 @@ class PLAYERS_Serivce():
         
         return {'status': 'success', 'data': data, 'message': 'Previous participation', 'status_code':http.HTTPStatus.OK}
         
+    def get_wishlist(self, user_id: str):
+        data = (
+            self.db.query(WISHLIST)
+            .filter(WISHLIST.user_id == user_id)
+            .join(TOURNAMENT, WISHLIST.tournament_id == TOURNAMENT.id)
+            .options(joinedload(WISHLIST.tournament).joinedload(TOURNAMENT.tournament_games))
+            .all()
+        )
 
+
+        return {'status': 'success', 'data': data, 'message': 'Wishlist', 'status_code': http.HTTPStatus.OK}
 
     def get_umpiring_tasks(self, user_id: str):
         pass

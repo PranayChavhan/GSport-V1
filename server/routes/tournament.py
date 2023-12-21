@@ -25,13 +25,21 @@ tournamentRouter = APIRouter()
 #     return TournamentService(db).create_tournament(tournament)
 
 
-@tournamentRouter.get('/getalltournament', response_model=List[Tournament])
+@tournamentRouter.get('/getalltournament')
 async def get_all_tournaments(
     db: Session = Depends(get_db)
-) -> List[Tournament]:
-    tournament_service = TournamentService(db)
-    tournaments = tournament_service.get_all_tournament()
-    return tournaments
+    ):
+    response = TournamentService(db).get_all_tournament()
+    return response
+
+# @playersRouter.get('/previous_participation')
+# async def get_previous_participation(
+#     user_id: str=Depends(get_current_user), 
+#     db: Session = Depends(get_db)
+#     ):
+#     response = PLAYERS_Serivce(db).get_previous_participation(user_id)
+#     return response
+
 
 
 

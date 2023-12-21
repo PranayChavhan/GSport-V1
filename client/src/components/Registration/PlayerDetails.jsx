@@ -121,10 +121,18 @@ const [tID, setTID] = useState("");
       no_of_girls: tID.min_girls,
       image: imgName,
       payment_id: "",
+      matches: 0,
+      win: 0,
+      loose: 0,
+      points: 0,
       verified: false
 
 
     };
+
+    // console.log('====================================');
+    // console.log(jsonData);
+    // console.log('====================================');
     postRequest(
       "/players/create_team",
       jsonData,
@@ -143,7 +151,7 @@ const [tID, setTID] = useState("");
         });
 
         console.log('====================================');
-        console.log(data.data);
+        console.log(data);
         console.log('====================================');
         navigate(`/organizer/register/payments/${id}/${data.data}`)
       })

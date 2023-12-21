@@ -25,8 +25,6 @@ class Organizer(BaseModel):
 class Wishlist(BaseModel):
     user_id: str
     tournament_id: str
-    mobile_number: str
-    password: str
 
 class Tournament(BaseModel):
     id:str
@@ -97,6 +95,10 @@ class Teams(BaseModel):
     no_of_girls: int
     verified: bool = False
     payment_id: str
+    matches: int
+    win: int
+    loose: int
+    points: int
     image:str
 
 class TeamPlayers(BaseModel):

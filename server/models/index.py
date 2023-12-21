@@ -24,6 +24,16 @@ class USERS(Base):
     createdAt = Column(DateTime, default=datetime.datetime.utcnow)
 
     
+class WISHLIST(Base):
+    __tablename__ = "WISHLIST"
+    id = Column(String(30), primary_key=True, index=True)
+    user_id = Column(String(30), ForeignKey("USERS.id", ondelete="CASCADE"), nullable=False)
+    user = relationship("USERS")
+    tournament_id = Column(String(30), ForeignKey('TOURNAMENT.id',ondelete="CASCADE"), nullable=False)
+    tournament = relationship("TOURNAMENT")
+    createdAt = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    
 class PLAYERS(Base):
     __tablename__ = "PLAYERS"
     
@@ -132,6 +142,11 @@ class TEAMS(Base):
     no_of_boys = Column(Integer, nullable=False)
     no_of_girls = Column(Integer, nullable=False)
     image = Column(String(255), nullable=True)
+    matches = Column(Integer, default=0)
+    win = Column(Integer, default=0)
+    loose = Column(Integer, default=0)
+    points = Column(Integer, default=0)
+    
     # if tournament was type 2 that is league one
     # then 
     group = Column(Integer, nullable=None)

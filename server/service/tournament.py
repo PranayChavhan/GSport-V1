@@ -1,5 +1,5 @@
-from schemas.index import GenericResponseModel, Tournament, Tournament_Games, Teams, TeamPlayers, Umpires, Grounds
-from models.index import TOURNAMENT, USERS, TOURNAMENT_GAMES, TEAMS, TEAM_PLAYERS, U_PAST_PARTICIPATION
+from schemas.index import GenericResponseModel, Tournament, Tournament_Games, Teams, TeamPlayers, Umpires, Grounds, Wishlist
+from models.index import TOURNAMENT, USERS, TOURNAMENT_GAMES, TEAMS, TEAM_PLAYERS, U_PAST_PARTICIPATION, WISHLIST
 from sqlalchemy.orm import Session, joinedload, load_only
 from sqlalchemy import and_,desc,func
 import shortuuid
@@ -61,22 +61,28 @@ class TournamentService():
 
             return {'status': 'success', 'data': tournaments, 'message': 'Tournament details', 'status_code':http.HTTPStatus.OK}
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        
-    def get_tournament_by(self):
-        tournament = self.db.query(TOURNAMENT)
-        return tournament
-
 
     def get_all_tournament(self):
-        data = self.db.query(TOURNAMENT).options(
+        data = (
+            self.db.query(TOURNAMENT)
+            .options(joinedload(TOURNAMENT.tournament_games))
+            .join(TOURNAMENT_GAMES, TOURNAMENT.id == TOURNAMENT_GAMES.tournament_id)
+            .all()
+        )
+
+        return {'status': 'success', 'data': data, 'message': 'Previous participation', 'status_code': http.HTTPStatus.OK}
+
+    def get_previous_participation(self, user_id: str):
+        data = self.db.query(U_PAST_PARTICIPATION).options(
                 joinedload(U_PAST_PARTICIPATION.tournament_game).options(
                     joinedload(TOURNAMENT_GAMES.game),
                     joinedload(TOURNAMENT_GAMES.tournament)
                 )
-            ).order_by(desc(TOURNAMENT.start_date)).all()
+            ).filter(U_PAST_PARTICIPATION.user_id==user_id).order_by(desc(U_PAST_PARTICIPATION.createdAt)).all()
         
         return {'status': 'success', 'data': data, 'message': 'Previous participation', 'status_code':http.HTTPStatus.OK}
         
+
 
     def create_tournament(self, tournament: Tournament):
         t = TOURNAMENT(**tournament.dict())
@@ -233,6 +239,10 @@ class TournamentService():
         return GenericResponseModel(status='success', message='Team created successfully', data=team_id, status_code=http.HTTPStatus.ACCEPTED)     
 # =======================================================================================
 
+    
+
+    
+    
     def update_team(self, team: Teams, team_id: str, user_id: str) -> GenericResponseModel:
         t = self.db.query(TEAMS).filter(and_(TEAMS.id == team_id)).first()
 

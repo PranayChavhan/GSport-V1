@@ -99,6 +99,7 @@ class Teams(BaseModel):
     win: int
     loose: int
     points: int
+    score: int
     image:str
 
 class TeamPlayers(BaseModel):

@@ -109,16 +109,20 @@ class TournamentService():
         self.db.commit()
         return GenericResponseModel(status='success', message='Tournament details updated', status_code=http.HTTPStatus.ACCEPTED)
 
-
-   
     
+   
     # .options(joinedload(Matches.team_1).load_only(Teams.name), joinedload(Matches.team_2).load_only(Teams.name))
     def get_tournament_by_id(self, tournament_id: str):
-        tournament = self.db.query(TOURNAMENT).filter(TOURNAMENT.id == tournament_id).first()
-        
-        if tournament is None:
+        data = (
+            self.db.query(TOURNAMENT)
+            .options(joinedload(TOURNAMENT.tournament_games))
+            .join(TOURNAMENT_GAMES, TOURNAMENT.id == TOURNAMENT_GAMES.tournament_id)
+            .filter(TOURNAMENT.id == tournament_id)
+            .first()
+        )
+        if data is None:
             return GenericResponseModel(status='error', message='Tournament not found or invalid data', status_code=http.HTTPStatus.BAD_REQUEST)
-        return {'status': 'success', 'data': tournament, 'message': 'Tournament details found', 'status_code':http.HTTPStatus.ACCEPTED}
+        return {'status': 'success', 'data': data, 'message': 'Tournament details found', 'status_code':http.HTTPStatus.ACCEPTED}
 
 
     def get_tournament_by_userid(self, user_id: str):

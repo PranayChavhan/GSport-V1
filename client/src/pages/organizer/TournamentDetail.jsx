@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { getRequest, postRequest } from "../../api/api";
+import { getRequest, postRequest, patchRequest } from "../../api/api";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card, Typography } from "@material-tailwind/react";
 import { FaUndoAlt } from "react-icons/fa";
@@ -11,13 +11,15 @@ const TABLE_HEAD = ["Team", "Matches", "Win", "Loose", "Points"];
 const TABLE_HEAD2 = ["Player", "College"];
 const TournamentDetail = () => {
   const [org, setOrg] = useState([]);
+  const [orgT, setOrgT] = useState([]);
   const [userData, setUserData] = useState("");
   const [token, setToken] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isStarted, setIsStarted] = useState(false);
+  const [isStarted, setIsStarted] = useState(true);
   const [isRegistered, setIsRegistered] = useState(false);
   const [tData, setTData] = useState([]);
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const getCookie = (name) => {
@@ -64,11 +66,18 @@ const TournamentDetail = () => {
           setIsAdmin(false);
         }
 
-        if (new Date().toLocaleDateString() == new Date(org.start_date).toLocaleDateString()) {
-          setIsStarted(true);
-        }else{
-          setIsStarted(false);
-        }
+        setOrgT(org.tournament_games[0])
+
+
+
+        // if (new Date().toLocaleDateString() >= new Date(org.start_date).toLocaleDateString()) {
+        //   setIsStarted(true);
+        //   console.log('====================================');
+        //   console.log(isStarted);
+        //   console.log('====================================');
+        // }else{
+        //   setIsStarted(false);
+        // }
 
         const teamData = await getRequest(
           `players/team/tournament_id/${id}?token=${token}`
@@ -81,8 +90,34 @@ const TournamentDetail = () => {
 
     };
     fetchTournamentData();
-  }, [id, org.organizer_id, org.start_date, token, userData.id]);
+  }, [id, org.organizer_id, org.start_date, org.tournament_games, token, userData.id]);
 
+
+  
+  // console.log('====================================');
+  // console.log(orgT.avg_duration);
+  // console.log('====================================');
+  let initialDuration = orgT.avg_duration ||20; 
+
+  const [timer, setTimer] = useState(initialDuration);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  
+
+  useEffect(() => {
+    let countdown;
+
+    if (isTimerRunning) {
+      countdown = setInterval(() => {
+        setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
+      }, 1000);
+    }
+
+    return () => clearInterval(countdown);
+  }, [isTimerRunning]);
+
+  const toggleTimer = () => {
+    setIsTimerRunning((prevIsTimerRunning) => !prevIsTimerRunning);
+  };
 
   function generateMatchSchedule(teams) {
     const schedule = [];
@@ -111,15 +146,64 @@ const TournamentDetail = () => {
     return schedule;
   }
   const matchSchedule = generateMatchSchedule(tData);
+
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
-  const incrementScore = (player) => {
-    if (player === "player1") {
-      setPlayer1Score(player1Score + 1);
-    } else if (player === "player2") {
-      setPlayer2Score(player2Score + 1);
-    }
+
+
+  const saveDetails = () => {
+
+
+
+    
   };
+  
+  const incrementScore = (player, team_id, team_score) => {
+    const jsonData = {
+      score: team_score+1
+    };
+    
+    patchRequest(
+      `/players/create_team/${team_id} `,
+      jsonData,
+      token
+    )
+      .then((data) => {
+        console.log('====================================');
+        console.log(data, team_id, jsonData);
+        console.log('====================================');
+        toast.success("Updates successful!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 400) {
+          console.error("API error");
+          toast.error("An error occurred. Please try again.", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          console.error("API error:", error);
+        }
+      });
+
+  };
+
+
   const decrementScore = (player) => {
     if (player === "player1" && player1Score > 0) {
       setPlayer1Score(player1Score - 1);
@@ -207,11 +291,9 @@ const TournamentDetail = () => {
             <>
              {
                <div className="col-start-1 col-end-5 ">
-                {isAdmin ? (
-                    <>
                     {matchSchedule.map((item, index) => (
                       <div key={index} className="">
-                        <div className=" p-4 bg-gray-50 shadow-lg rounded-lg mb-10 ">
+                        <div className=" p-4 bg-gray-50 shadow-lg rounded-lg rounded-b-[55px] mb-10 ">
                           <div className="flex flex-row justify-between items-center mb-4 border-b-2 pb-2">
                             {/* <p>24 March 2023</p> */}
                             <p>Venue: PICT Campus </p>
@@ -248,12 +330,12 @@ const TournamentDetail = () => {
 
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player1Score}
+                                          {item.team1.score}
                                         </p>
                                         <button
                                           className="bg-green-600 text-white w-full py-1"
                                           onClick={() =>
-                                            incrementScore("player1")
+                                            incrementScore("player1", item.team1.id, item.team1.score)
                                           }
                                         >
                                           +
@@ -266,7 +348,7 @@ const TournamentDetail = () => {
                                     <div className="flex flex-row items-center  gap-4">
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player1Score}
+                                          {item.team1.score}
                                         </p>
                                       </div>
                                     </div>
@@ -276,11 +358,27 @@ const TournamentDetail = () => {
                             </div>
 
                             <div className="w-1/4 p-4 flex flex-col items-center">
-                              <h2 className="text-lg font-semibold mb-2">
-                                Timer
-                              </h2>
-                              <div className="text-2xl font-bold">00:30</div>
-                            </div>
+      <h2 className="text-lg font-semibold mb-2">Timer</h2>
+      <div className="text-2xl font-bold">{`${Math.floor(timer / 60)
+        .toString()
+        .padStart(2, '0')}:${(timer % 60).toString().padStart(2, '0')}`}</div>
+     {
+      isAdmin
+      ?
+      <>
+       <div className="mt-2">
+
+<button className={
+  isTimerRunning?'bg-red-300 px-2 py-1 rounded-lg':'bg-green-300 px-2 py-1 rounded-lg' 
+} onClick={toggleTimer}>
+  {isTimerRunning ? 'Stop The Match' : 'Start The Match'}
+</button>
+</div></>
+:
+null
+     }
+
+    </div>
 
                             <div className="flex flex-row items-center gap-4">
                               <div className="mb-2 mr-10">
@@ -289,12 +387,12 @@ const TournamentDetail = () => {
                                     <div className="flex flex-row items-center  gap-4">
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player2Score}
+                                          {item.team2.score}
                                         </p>
                                         <button
                                           className="bg-green-600 text-white w-full py-1"
                                           onClick={() =>
-                                            incrementScore("player2")
+                                            incrementScore("player2", item.team2.id, item.team2.score)
                                           }
                                         >
                                           +
@@ -317,7 +415,7 @@ const TournamentDetail = () => {
                                     <div className="flex flex-row items-center  gap-4">
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player2Score}
+                                          {item.team2.score}
                                         </p>
                                       </div>
                                     </div>
@@ -338,40 +436,17 @@ const TournamentDetail = () => {
                               </div>
                             </div>
                           </div>
+
+                          <div className="bg-gray-200 -m-4 p-4 rounded-b-full">
+                          <div className="px-6">
+                            <p>Result: </p>
+                          </div>
                         </div>
+                        </div>
+                        
                       </div>
                        ))}
-                    </>
-                  ) : (
-                    <>
-                      {
-                        isRegistered 
-                        ?-
-                        <>
-                        <p>registered</p>
-                        </>
-                        :
-                        <>
-                        <div className="col-start-1 col-end-5">
-                        <Link
-                          to={`/organizer/register/player-details/${id}`}
-                          className="flex-shrink-0 ml-[21rem] shadow-sm text-white bg-orange-500 border-0 py-2 px-8 focus:outline-none hover:bg-yellow-600 rounded-md text-lg sm:mt-0"
-                        >
-                          Register
-                        </Link>
 
-                        <button
-                          onClick={addToWishlist}
-                          className="flex-shrink-0 ml-10 shadow-sm text-white bg-orange-500 border-0 py-2 px-8 focus:outline-none hover:bg-yellow-600 rounded-md text-lg sm:mt-0"
-                        >
-                          Add to wishlist
-                        </button>
-                      </div>
-                        </>
-                      }
-                    </>
-                  )}
-               
                   </div>
               
              }
@@ -386,7 +461,7 @@ const TournamentDetail = () => {
 
                    
                       <div key={index} className="">
-                        <div className=" p-4 bg-gray-50 shadow-lg rounded-lg mb-10 ">
+                        <div className=" p-4 bg-gray-50 shadow-lg rounded-b-full mb-10 ">
                           <div className="flex flex-row justify-between items-center mb-4 border-b-2 pb-2">
                             {/* <p>24 March 2023</p> */}
                             <p>Venue: PICT Campus </p>
@@ -423,12 +498,12 @@ const TournamentDetail = () => {
 
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player1Score}
+                                          {item.team1.score}
                                         </p>
                                         <button
                                           className="bg-green-600 text-white w-full py-1"
                                           onClick={() =>
-                                            incrementScore("player1")
+                                            incrementScore("player1", item.team1.id, item.team1.score)
                                           }
                                         >
                                           +
@@ -441,7 +516,7 @@ const TournamentDetail = () => {
                                     <div className="flex flex-row items-center  gap-4">
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player1Score}
+                                          {item.team1.score}
                                         </p>
                                       </div>
                                     </div>
@@ -464,12 +539,12 @@ const TournamentDetail = () => {
                                     <div className="flex flex-row items-center  gap-4">
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player2Score}
+                                          {item.team2.score}
                                         </p>
                                         <button
                                           className="bg-green-600 text-white w-full py-1"
                                           onClick={() =>
-                                            incrementScore("player2")
+                                            incrementScore("player2", item.team2.id, item.team2.score)
                                           }
                                         >
                                           +
@@ -492,7 +567,7 @@ const TournamentDetail = () => {
                                     <div className="flex flex-row items-center  gap-4">
                                       <div>
                                         <p className="bg-gray-100 border p-5 font-black">
-                                          {player2Score}
+                                          {item.team2.score}
                                         </p>
                                       </div>
                                     </div>

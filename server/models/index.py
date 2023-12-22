@@ -146,7 +146,7 @@ class TEAMS(Base):
     win = Column(Integer, default=0)
     loose = Column(Integer, default=0)
     points = Column(Integer, default=0)
-    
+    score = Column(Integer, default=0)
     # if tournament was type 2 that is league one
     # then 
     group = Column(Integer, nullable=None)

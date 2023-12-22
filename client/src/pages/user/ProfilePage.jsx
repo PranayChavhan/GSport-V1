@@ -93,9 +93,7 @@ const ProfilePage = () => {
 
 
 
-  console.log('====================================');
-  console.log(editedName, editedEmail, editedMobile, editedCollege);
-  console.log('====================================');
+
   const saveDetails = () => {
     const jsonData = {
       email_id: editedEmail ? editedEmail : userInformation.email_id,

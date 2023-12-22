@@ -51,7 +51,7 @@ async def join_team(
 @playersRouter.get('/team/{team_id}')
 async def get_team_by_id(team_id: str, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
     team = db.query(TEAMS).options(
-        load_only(TEAMS.name, TEAMS.admin_id, TEAMS.tournament_game_id, TEAMS.image, TEAMS.matches, TEAMS.win, TEAMS.loose, TEAMS.points, TEAMS.createdAt),
+        load_only(TEAMS.name, TEAMS.admin_id, TEAMS.tournament_game_id, TEAMS.image, TEAMS.matches, TEAMS.win, TEAMS.loose, TEAMS.points, TEAMS.createdAt, TEAMS.score),
         joinedload(TEAMS.admin).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender, USERS.college),
         joinedload(TEAMS.team_players).load_only(TEAM_PLAYERS.id).joinedload(TEAM_PLAYERS.player).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender),
     ).filter(TEAMS.id == team_id).first()
@@ -64,7 +64,7 @@ async def get_team_by_id(team_id: str, user_id: str=Depends(get_current_user), d
 @playersRouter.get('/team/tournament_id/{tournament_id}')
 async def get_team_by_id(tournament_id: str, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
     team = db.query(TEAMS).options(
-        load_only(TEAMS.name, TEAMS.admin_id, TEAMS.tournament_game_id, TEAMS.image, TEAMS.matches, TEAMS.win, TEAMS.loose, TEAMS.points, TEAMS.createdAt),
+        load_only(TEAMS.name, TEAMS.admin_id, TEAMS.tournament_game_id, TEAMS.image, TEAMS.matches, TEAMS.win, TEAMS.loose, TEAMS.points, TEAMS.createdAt, TEAMS.score),
         joinedload(TEAMS.admin).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender, USERS.college),
         joinedload(TEAMS.team_players).load_only(TEAM_PLAYERS.id).joinedload(TEAM_PLAYERS.player).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender),
     ).filter(TEAMS.tournament_id == tournament_id).all()

@@ -125,6 +125,7 @@ const [tID, setTID] = useState("");
       win: 0,
       loose: 0,
       points: 0,
+      score: 0,
       verified: false
 
 

@@ -159,7 +159,7 @@ const Topbar = () => {
 
   return (
     <div>
-      <header className="text-gray-700 shadow-sm body-font fixed top-5 rounded-2xl w-[95rem] text-sm">
+      <header className="text-gray-700 shadow-sm body-font fixed top-5 rounded-2xl w-[95rem] text-sm z-50">
         <div className="mx-auto flex flex-wrap flex-col md:flex-row items-center py-1 bg-gray-50 rounded-lg">
          
           <nav className="md:ml-auto md:mr-auto flex gap-8 flex-wrap items-center text-sm justify-center">

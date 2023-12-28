@@ -109,8 +109,8 @@ const LoginPage = () => {
   return (
     <div>
       <section className="text-gray-400 bg-gray-900 body-font relative h-full">
-        <div className="absolute inset-0 h-full">
-          <div className=" h-full">
+        <div className="absolute inset-0 lg:h-full hidden lg:block">
+          <div className=" lg:h-full ">
             <img
               src="/login2.jpg"
               alt="img"
@@ -119,12 +119,12 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <p className="p-5 text-2xl font-bold text-white opacity-100 relative">
-          GSort***
+        <p className="p-5 text-2xl font-bold text-white opacity-100 relative hidden lg:block">
+          GSort
         </p>
 
-        <div className="container py-[108px] mx-auto flex">
-          <div className="lg:w-1/3 md:w-1/2 bg-white shadow-md rounded-lg p-8 flex flex-col justify-center items-center md:ml-auto md:mt-0 relative z-10">
+        <div className="lg:container lg:py-[108px] lg:mx-auto flex">
+          <div className="lg:w-1/3 md:w-1/2 bg-white lg:shadow-md lg:rounded-lg lg:p-8 w-full pt-4 flex flex-col justify-center items-center lg:md:ml-auto md:mt-0 relative z-10">
             <Card className="p-5" color="transparent" shadow={false}>
               <Typography variant="h4" color="blue-gray">
                 Sign In

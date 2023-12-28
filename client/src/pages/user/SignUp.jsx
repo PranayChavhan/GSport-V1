@@ -144,11 +144,11 @@ const SignUp = () => {
           </div>
         </div>
 
-        <p className="p-5 text-2xl font-bold text-white opacity-100 relative">
-          GSort***
+        <p className="p-5 text-2xl font-bold text-white opacity-100 relative hidden lg:block">
+          GSort
         </p>
 
-        <div className="container py-[36px] mx-auto flex">
+        <div className="container lg:py-[36px] mx-auto flex">
           <div className="lg:w-1/3 md:w-1/2 bg-white shadow-md rounded-lg p-5  flex flex-col justify-center items-center md:ml-auto md:mt-0 relative z-10">
             <Card className="p-5" color="transparent" shadow={false}>
               <Typography variant="h4" color="blue-gray">

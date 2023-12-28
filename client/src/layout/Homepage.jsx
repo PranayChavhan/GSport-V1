@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import Footer from "../components/Footer";
 import Navbar from "../components/Navbar"
 
 export default function Discover ()  {
@@ -10,6 +11,7 @@ export default function Discover ()  {
       <div className="w-full h-full  font-poppins pt-[7rem]  ">
           <Outlet/>
       </div>
+      <Footer/>
   </div>
   )
 }

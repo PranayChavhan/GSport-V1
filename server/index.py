@@ -31,7 +31,6 @@ app.include_router(generalRouter, prefix='/general', tags=["General"])
 app.include_router(fixturesRouter, prefix='/fixtures', tags=["Fixtures"])
 app.include_router(vtbRouter, prefix='/VTB', tags=["VTB"])
 app.include_router(footballRouter, prefix='/football', tags=["Football"])
-
 app.include_router(adminRouter, prefix='/admin', tags=["Admin"])
 
 

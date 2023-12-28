@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException, Response
+from fastapi import APIRouter, status, HTTPException, Response, WebSocket
 from models.index import PLAYERS, DOCUMENTS, TEAMS, TEAM_PLAYERS, USERS, WISHLIST
 from schemas.index import Player, Document, Login, Teams, Wishlist, TeamPlayers,GenericResponseModel
 from sqlalchemy.orm import Session, joinedload, load_only
@@ -10,7 +10,8 @@ from sqlalchemy import and_
 from service.index import TournamentService,PLAYERS_Serivce
 import http
 from utils.general import model_to_dict
-
+import asyncio
+from pydantic import BaseModel
 
 playersRouter = APIRouter()
 
@@ -21,6 +22,46 @@ async def fetch_all_players(db: Session = Depends(get_db)):
 # @playersRouter.post('/plays')
 # async def add_plays(game: str, user_id: str, db: Session = Depends(get_db)):
 #     pass
+
+
+# Simple in-memory storage for the countdown status
+countdown_status = {"running": False, "duration": 0}
+connected_clients = set()
+
+
+class CountdownStartRequest(BaseModel):
+    duration: int
+
+
+@playersRouter.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    connected_clients.add(websocket)
+
+    try:
+        while True:
+            await asyncio.sleep(1)
+            if countdown_status["running"]:
+                await asyncio.gather(
+                    *[client.send_json({"status": "running", "duration": countdown_status["duration"]}) for client in connected_clients]
+                )
+    except asyncio.CancelledError:
+        connected_clients.remove(websocket)
+
+
+@playersRouter.post("/api/countdown/start")
+async def start_countdown(request: CountdownStartRequest):
+    countdown_status["running"] = True
+    countdown_status["duration"] = request.duration
+    await asyncio.gather(
+        *[client.send_json({"status": "running", "duration": request.duration}) for client in connected_clients]
+    )
+    await asyncio.sleep(request.duration)
+    countdown_status["running"] = False
+    await asyncio.gather(
+        *[client.send_json({"status": "stopped", "duration": 0}) for client in connected_clients]
+    )
+    return {"status": "success", "message": "Countdown completed"}
 
 
 

@@ -12,7 +12,7 @@ const TABLE_HEAD = ["Team", "Matches", "Win", "Loose", "Points"];
 const TABLE_HEAD2 = ["Player", "College"];
 const TournamentDetail = () => {
   const [org, setOrg] = useState([]);
-  const [orgT, setOrgT] = useState([]);
+  const [commentry, setCommentry] = useState([]);
   const [userData, setUserData] = useState("");
   const [token, setToken] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -21,8 +21,7 @@ const TournamentDetail = () => {
   const [tData, setTData] = useState([]);
   const [matchFinish, setMatchFinish] = useState(false);
   const navigate = useNavigate();
-
-
+  const [adminComment, setAdminComment] = useState("");
 
   useEffect(() => {
     const getCookie = (name) => {
@@ -63,28 +62,48 @@ const TournamentDetail = () => {
         const data = await getRequest(url);
         setOrg(data.data);
 
-        if (org.organizer_id === userData.id) {
+        if (data.data.organizer_id === userData.id) {
           setIsAdmin(true);
         } else {
           setIsAdmin(false);
         }
-
+        setCommentry(data.data.commentry);
         const teamData = await getRequest(
           `players/team/tournament_id/${id}?token=${token}`
         );
-        const sortedData = [...teamData.data].sort((a, b) => b.points - a.points);
+
+        const sortedData = [...teamData.data].sort(
+          (a, b) => b.points - a.points
+        );
         setTData(sortedData);
       } catch (error) {
         console.error("Error fetching tournament data:", error);
       }
+
+
     };
-    fetchTournamentData();
-  }, [id, org.organizer_id, token, userData.id]);
+
+
+    console.log('====================================');
+    console.log("hello");
+    console.log('====================================');
+    
+    const intervalId = setInterval(fetchTournamentData, 1000);
+    return () => clearInterval(intervalId);
+
+
+
+  }, [id, token, userData.id]);
 
 
 
 
-  let initialDuration = orgT.avg_duration || 5;
+
+
+
+
+
+  let initialDuration = 20;
 
   const [timer, setTimer] = useState(initialDuration);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -99,7 +118,6 @@ const TournamentDetail = () => {
     }
     return () => clearInterval(countdown);
   }, [isTimerRunning, tData]);
-
 
   const toggleTimer = () => {
     setIsTimerRunning((prevIsTimerRunning) => !prevIsTimerRunning);
@@ -156,22 +174,41 @@ const TournamentDetail = () => {
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
 
-  const incrementScore = (player, team_id, team_score) => {
+  const incrementScore = (
+    player,
+    team_id,
+    team_score,
+    team_name,
+    team_collegeName
+  ) => {
     const jsonData = {
       score: team_score + 1,
     };
     patchRequest(`/players/create_team/${team_id} `, jsonData, token)
       .then((data) => {
-        toast.success("Updates successful!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        if (data.status == "success") {
+          toast.success("Updates successful!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+
+          console.log("====================================");
+          console.log(
+            `${team_name} from ${team_collegeName} scores 1 score. Now total score of ${team_name} is ${jsonData.score}`
+          );
+          console.log("====================================");
+
+          const jsonString = {
+            comment: `${team_name} from ${team_collegeName} scores 1 score. Now total score of ${team_name} is ${jsonData.score}`
+          }
+          postRequest(`/organizer/tournament/${id}/comments`, jsonString, token)
+        }
       })
       .catch((error) => {
         if (error.response && error.response.status === 400) {
@@ -192,7 +229,16 @@ const TournamentDetail = () => {
       });
   };
 
-  
+
+  const handleComment = ()=>{
+
+    const jsonString = {
+      comment: adminComment
+    }
+    postRequest(`/organizer/tournament/${id}/comments`, jsonString, token)
+
+    setAdminComment("");
+  }
 
   const decrementScore = (player) => {
     if (player === "player1" && player1Score > 0) {
@@ -284,7 +330,6 @@ const TournamentDetail = () => {
             <>
               {
                 <div className="col-start-1 col-end-5 ">
- 
                   {matchSchedule.map((item, index) => (
                     <div key={index} className="">
                       <div className=" p-4 bg-gray-50 shadow-lg rounded-lg rounded-b-[55px] mb-10 ">
@@ -313,7 +358,7 @@ const TournamentDetail = () => {
                                   <div className="flex flex-row items-center  gap-4">
                                     <div>
                                       <button
-                                        disabled={timer == 0 ? true : false}
+                                        disabled={isTimerRunning ? false : true}
                                         className="text-red-500"
                                         onClick={() =>
                                           decrementScore("player1")
@@ -328,13 +373,15 @@ const TournamentDetail = () => {
                                         {item.team1.score}
                                       </p>
                                       <button
-                                        disabled={timer == 0 ? true : false}
+                                        disabled={isTimerRunning ? false : true}
                                         className="bg-green-600 text-white w-full py-1"
                                         onClick={() =>
                                           incrementScore(
                                             "player1",
                                             item.team1.id,
-                                            item.team1.score
+                                            item.team1.score,
+                                            item.team1.name,
+                                            item.team1.admin.college
                                           )
                                         }
                                       >
@@ -407,13 +454,15 @@ const TournamentDetail = () => {
                                         {item.team2.score}
                                       </p>
                                       <button
-                                        disabled={timer == 0 ? true : false}
+                                        disabled={isTimerRunning ? false : true}
                                         className="bg-green-600 text-white w-full py-1"
                                         onClick={() =>
                                           incrementScore(
                                             "player2",
                                             item.team2.id,
-                                            item.team2.score
+                                            item.team2.score,
+                                            item.team2.name,
+                                            item.team2.admin.college
                                           )
                                         }
                                       >
@@ -422,7 +471,7 @@ const TournamentDetail = () => {
                                     </div>
                                     <div>
                                       <button
-                                        disabled={timer == 0 ? true : false}
+                                        disabled={isTimerRunning ? false : true}
                                         className="text-red-500"
                                         onClick={() =>
                                           decrementScore("player2")
@@ -487,96 +536,92 @@ const TournamentDetail = () => {
                                 </div>
                                 <button
                                   onClick={() => {
-                                   if(item.team1.score > item.team2.score){
-                                     const jsonData = {
-                                      matches: item.team1.matches + 1,
-                                      win: item.team1.win + 1,
-                                      points: item.team1.points + 2
-                                    };
-                                    const jsonData2 = {
-                                      matches: item.team2.matches + 1,
-                                      loose: item.team2.loose + 1,
-                                    };
-                                    patchRequest(
-                                      `/players/create_team/${item.team1.id} `,
-                                      jsonData,
-                                      token
-                                    )
-                                      .then((data) => {})
-                                      .catch((error) => {
-                                        if (
-                                          error.response &&
-                                          error.response.status === 400
-                                        ) {
-                                          console.error("API error");
-                                        } else {
-                                          console.error("API error:", error);
-                                        }
-                                      });
-                                       patchRequest(
-                                      `/players/create_team/${item.team2.id} `,
-                                      jsonData2,
-                                      token
-                                    )
-                                      .then((data) => {})
-                                      .catch((error) => {
-                                        if (
-                                          error.response &&
-                                          error.response.status === 400
-                                        ) {
-                                          console.error("API error");
-                                        } else {
-                                          console.error("API error:", error);
-                                        }
-                                      });
+                                    if (item.team1.score > item.team2.score) {
+                                      const jsonData = {
+                                        matches: item.team1.matches + 1,
+                                        win: item.team1.win + 1,
+                                        points: item.team1.points + 2,
+                                      };
+                                      const jsonData2 = {
+                                        matches: item.team2.matches + 1,
+                                        loose: item.team2.loose + 1,
+                                      };
+                                      patchRequest(
+                                        `/players/create_team/${item.team1.id} `,
+                                        jsonData,
+                                        token
+                                      )
+                                        .then((data) => {})
+                                        .catch((error) => {
+                                          if (
+                                            error.response &&
+                                            error.response.status === 400
+                                          ) {
+                                            console.error("API error");
+                                          } else {
+                                            console.error("API error:", error);
+                                          }
+                                        });
+                                      patchRequest(
+                                        `/players/create_team/${item.team2.id} `,
+                                        jsonData2,
+                                        token
+                                      )
+                                        .then((data) => {})
+                                        .catch((error) => {
+                                          if (
+                                            error.response &&
+                                            error.response.status === 400
+                                          ) {
+                                            console.error("API error");
+                                          } else {
+                                            console.error("API error:", error);
+                                          }
+                                        });
+                                    } else {
+                                      const jsonData = {
+                                        matches: item.team1.matches + 1,
+                                        loose: item.team1.loose + 1,
+                                      };
+                                      const jsonData2 = {
+                                        matches: item.team2.matches + 1,
 
-                                   }else{
-                                     const jsonData = {
-                                      matches: item.team1.matches + 1,
-                                      loose: item.team1.loose + 1,
-                                    };
-                                    const jsonData2 = {
-                                      matches: item.team2.matches + 1,
-                                      
-                                      win: item.team2.win + 1,
-                                      points: item.team2.points + 2
-                                    };
-                                    patchRequest(
-                                      `/players/create_team/${item.team1.id} `,
-                                      jsonData,
-                                      token
-                                    )
-                                      .then((data) => {})
-                                      .catch((error) => {
-                                        if (
-                                          error.response &&
-                                          error.response.status === 400
-                                        ) {
-                                          console.error("API error");
-                                        } else {
-                                          console.error("API error:", error);
-                                        }
-                                      });
-                                       patchRequest(
-                                      `/players/create_team/${item.team2.id} `,
-                                      jsonData2,
-                                      token
-                                    )
-                                      .then((data) => {})
-                                      .catch((error) => {
-                                        if (
-                                          error.response &&
-                                          error.response.status === 400
-                                        ) {
-                                          console.error("API error");
-                                        } else {
-                                          console.error("API error:", error);
-                                        }
-                                      });
-
-                                   }
-                                   
-
+                                        win: item.team2.win + 1,
+                                        points: item.team2.points + 2,
+                                      };
+                                      patchRequest(
+                                        `/players/create_team/${item.team1.id} `,
+                                        jsonData,
+                                        token
+                                      )
+                                        .then((data) => {})
+                                        .catch((error) => {
+                                          if (
+                                            error.response &&
+                                            error.response.status === 400
+                                          ) {
+                                            console.error("API error");
+                                          } else {
+                                            console.error("API error:", error);
+                                          }
+                                        });
+                                      patchRequest(
+                                        `/players/create_team/${item.team2.id} `,
+                                        jsonData2,
+                                        token
+                                      )
+                                        .then((data) => {})
+                                        .catch((error) => {
+                                          if (
+                                            error.response &&
+                                            error.response.status === 400
+                                          ) {
+                                            console.error("API error");
+                                          } else {
+                                            console.error("API error:", error);
+                                          }
+                                        });
+                                    }
                                   }}
                                   className="bg-gray-400 px-3 rounded-md font-medium hover:bg-gray-500"
                                 >
@@ -589,6 +634,27 @@ const TournamentDetail = () => {
                       </div>
                     </div>
                   ))}
+
+                  <div>
+                    <p>Commentry</p>
+
+                    {commentry.map((item, index) => (
+                      <div key={index}>
+                        <div className="bg-gray-50 my-2 text-gray-800  p-4 rounded-2xl text-[14px] flex flex-row justify-between items-center">
+                          <p>{item.comment}</p>
+
+                          <p className="text-xs text-gray-600">
+                            {new Date(item.createdAt).toLocaleString("en-US", {
+                              hour: "numeric",
+                              minute: "numeric",
+                              second: "numeric",
+                              hour12: true,
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               }
             </>
@@ -646,7 +712,9 @@ const TournamentDetail = () => {
                                             incrementScore(
                                               "player1",
                                               item.team1.id,
-                                              item.team1.score
+                                              item.team1.score,
+                                              item.team1.name,
+                                              item.team1.admin.college
                                             )
                                           }
                                         >
@@ -692,7 +760,9 @@ const TournamentDetail = () => {
                                             incrementScore(
                                               "player2",
                                               item.team2.id,
-                                              item.team2.score
+                                              item.team2.score,
+                                              item.team2.name,
+                                              item.team2.admin.college
                                             )
                                           }
                                         >
@@ -851,21 +921,36 @@ const TournamentDetail = () => {
                 </tbody>
               </table>
             </Card>
+
+
+
+
+            <div className="border-t border-gray-400 mt-20 py-10">
+          <div className="relative mb-4">
+            <label className="leading-7 text-sm text-gray-600">Commentry</label>
+            <textarea
+             value={adminComment}
+             onChange={(e) => setAdminComment(e.target.value)}
+              id="message"
+              name="message"
+              className="w-full bg-white rounded border border-gray-300  focus:ring-2 focus:ring-orange-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
+            ></textarea>
           </div>
-{/* 
-          <div className=" mb-4 w-[100%]">
-        <label  className="leading-7 text-sm text-gray-600">{new Date().toLocaleTimeString()}</label>
-        <input  className=" bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"/>
-      </div> */}
+          <button
+          onClick={handleComment}
+           className="text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded-md text-lg">
+            Comment
+          </button>
+        </div>
+        
+
+
+
+          </div>
+        
         </div>
 
-        <div className="border-t border-gray-400 mt-20 py-10">
-        <div className="relative mb-4">
-        <label className="leading-7 text-sm text-gray-600">Commentry</label>
-        <textarea id="message" name="message" className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
-      </div>
-      <button className="text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded-md text-lg">Comment</button>
-        </div>
+        
       </section>
     </div>
   );

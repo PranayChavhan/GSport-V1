@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException, Response
+from fastapi import APIRouter, status, HTTPException, Response, Form
 from models.index import ORGANIZERS, DOCUMENTS, USERS
 from schemas.index import Organizer, Document, Login, User, GenericResponseModel
 from sqlalchemy.orm import Session 
@@ -11,12 +11,45 @@ from uuid import uuid4
 import shortuuid
 import http
 from utils.general import model_to_dict
-
+import httpx
 # from fastapi_pagination import LimitOffsetPage, Page
 # from fastapi_pagination.ext.sqlalchemy import paginate
 
 #routes
 userRouter = APIRouter()
+
+import random
+
+# Replace this with a secure way to generate and store OTPs in a real-world scenario
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+@userRouter.post("/send_otp")
+async def send_otp(mobile: str = Form(...)):
+    AUTH_TOKEN = "1651|TW6YbFnKwTgOHBUiGgxsD2LiV4pmEfYOADcQlKO7 "
+    API_URL = "https://sms.send.lk/api/v3/sms/send"
+
+    otp = generate_otp()
+    message = f"Your OTP for verification is: {otp}"
+
+    msg_data = {
+        "recipient": mobile,
+        "sender_id": "SendTest",
+        "message": message
+    }
+    headers = {
+        "accept": "application/json",
+        "Authorization": "Bearer 1651|TW6YbFnKwTgOHBUiGgxsD2LiV4pmEfYOADcQlKO7",
+    }
+    
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(API_URL, data=msg_data, headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=f"Request failed with status code: {response.status_code}")
+
+        return {"message": "OTP sent successfully", "otp": otp}
 
 @userRouter.get('/')
 async def fetch_all_users(db: Session = Depends(get_db)):

@@ -3,6 +3,22 @@ import datetime
 from typing import Optional, Any
 import enum
 
+
+
+class Token(BaseModel):
+    token: str
+    
+class PhoneNumber(BaseModel):
+    phone_number: str
+    
+class ValidateCode(Token):
+    code: str
+    
+class Message(BaseModel):
+    message: str
+    
+    
+    
 class User(BaseModel):
     email_id: str
     full_name: str
@@ -40,6 +56,9 @@ class Tournament(BaseModel):
     payment_id: str
     is_active: bool = True
 
+class Commentry(BaseModel):
+    comment: str
+    
 class Tournament_Games(BaseModel):
     name: str
     info: str = None

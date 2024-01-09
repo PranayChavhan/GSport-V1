@@ -84,12 +84,23 @@ class TOURNAMENT(Base):
     payment_id = Column(String(100), nullable=True)
     is_active = Column(Boolean, default=True)
     tournament_games = relationship("TOURNAMENT_GAMES", back_populates="tournament")
+    commentry = relationship("COMMENTRY")
 
 
 class GAMES(Base):
     __tablename__ = "GAMES"
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
+    
+class COMMENTRY(Base):
+    __tablename__ = "COMMENTRY"
+    id = Column(Integer, primary_key=True,index=True, autoincrement=True)
+    comment = Column(String(900), nullable=False)
+    tournament_id = Column(String(30), ForeignKey('TOURNAMENT.id',ondelete="CASCADE"), nullable=False)
+    tournament = relationship("TOURNAMENT")
+    
+    createdAt = Column(DateTime, default=datetime.datetime.utcnow)
+    
 
 class TOURNAMENT_GAMES(Base):
     __tablename__ = "TOURNAMENT_GAMES"

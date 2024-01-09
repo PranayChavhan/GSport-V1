@@ -1,7 +1,7 @@
 import uuid
 from fastapi import APIRouter, Query
 from models.index import ORGANIZERS, TOURNAMENT, TOURNAMENT_GAMES
-from schemas.index import Organizer, Tournament,GenericResponseModel, Tournament_Games, Umpires, Grounds, Winners, Losers
+from schemas.index import Organizer, Tournament,GenericResponseModel, Tournament_Games, Umpires, Grounds, Winners, Losers, Commentry
 from sqlalchemy.orm import Session, load_only
 from fastapi import Depends
 from config.db import get_db
@@ -72,11 +72,30 @@ async def get_image(filename: str):
 async def update_tournament(tournament_id: str,user_id: str = Depends(get_current_user),tournament: dict={},  db: Session = Depends(get_db))->GenericResponseModel:
     return TournamentService(db).update_tournament(tournament, tournament_id, user_id)
 
+
+
+
 @organizerRouter.post('/tournament/{tournament_id}/games')
 async def add_games_to_tournament(game: Tournament_Games,tournament_id: str,user_id: str = Depends(get_current_user),  db: Session = Depends(get_db))->GenericResponseModel:
     response = TournamentService(db).add_game(game, tournament_id, user_id)
     db.commit()
     return response
+
+@organizerRouter.post('/tournament/{tournament_id}/comments')
+async def add_comments(
+    comment: Commentry,
+    tournament_id: str,
+    user_id: str = Depends(get_current_user),  
+    db: Session = Depends(get_db)
+    )->GenericResponseModel:
+    response = TournamentService(db).add_comment(
+        comment,
+        tournament_id,
+        user_id
+        )
+    db.commit()
+    return response
+
 
 @organizerRouter.patch('/tournament/{tournament_id}/games')
 async def update_game(game_id: str,user_id: str = Depends(get_current_user),game: dict={},  db: Session = Depends(get_db))->GenericResponseModel:

@@ -1,5 +1,5 @@
-from schemas.index import GenericResponseModel, Tournament, Tournament_Games, Teams, TeamPlayers, Umpires, Grounds, Wishlist
-from models.index import TOURNAMENT, USERS, TOURNAMENT_GAMES, TEAMS, TEAM_PLAYERS, U_PAST_PARTICIPATION, WISHLIST
+from schemas.index import GenericResponseModel, Tournament, Tournament_Games, Teams, TeamPlayers, Umpires, Grounds, Wishlist, Commentry
+from models.index import TOURNAMENT, USERS, TOURNAMENT_GAMES, TEAMS, TEAM_PLAYERS, U_PAST_PARTICIPATION, WISHLIST, COMMENTRY
 from sqlalchemy.orm import Session, joinedload, load_only
 from sqlalchemy import and_,desc,func
 import shortuuid
@@ -115,8 +115,13 @@ class TournamentService():
     def get_tournament_by_id(self, tournament_id: str):
         data = (
             self.db.query(TOURNAMENT)
-            .options(joinedload(TOURNAMENT.tournament_games))
+            .options(
+                joinedload(TOURNAMENT.tournament_games))
             .join(TOURNAMENT_GAMES, TOURNAMENT.id == TOURNAMENT_GAMES.tournament_id)
+            .options(
+                joinedload(TOURNAMENT.commentry)
+            )
+            .join(COMMENTRY, TOURNAMENT.id == COMMENTRY.tournament_id)
             .filter(TOURNAMENT.id == tournament_id)
             .first()
         )
@@ -145,7 +150,16 @@ class TournamentService():
         self.db.add(game_obj)
         return GenericResponseModel(status='success', message='tournament created successfully', data={'game_id': game_obj.id}, status_code=http.HTTPStatus.CREATED)
 
+    def add_comment(self, comment: Commentry, tournament_id: str, user_id: str):
+        comment_obj = COMMENTRY(**comment.dict())
+        comment_obj.tournament_id = tournament_id
+        self.db.add(comment_obj)
+        return GenericResponseModel(
+            status='success',
+            message='commented successfully',
+            status_code=http.HTTPStatus.CREATED)
 
+    
     def update_game(self, game: Tournament_Games, game_id: str, user_id: str) -> GenericResponseModel:
         t_g = self.db.query(TOURNAMENT_GAMES).filter(and_(TOURNAMENT_GAMES.id == game_id)).first()
         

@@ -199,11 +199,7 @@ const Topbar = () => {
             </Link>
           </nav>
           <div className="flex flex-row items-center gap-4">
-            <div>
-              <Link to="/organizer/new-tournament/step1" className="border p-2 text-sm rounded-full bg-gray-100 px-4 hover:bg-gray-200">
-                Host Tournament
-              </Link>
-            </div>
+         
             {profileUrl ? (
               <div>
                 <ProfileMenu image={profileUrl} />

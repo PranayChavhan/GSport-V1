@@ -88,7 +88,7 @@ const HomePage = () => {
         <CardFooter className="mt-10 p-0">
 
 
-        <Link to={"/p/dashboard"}>
+        <Link to={"/player/dashboard"}>
 
           <Button
             size="lg"

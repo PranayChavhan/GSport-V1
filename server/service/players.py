@@ -7,7 +7,6 @@ from utils.general import model_to_dict
 import http
 from typing import List
 
-
 class PLAYERS_Serivce():
 
     def __init__(self, db: Session):

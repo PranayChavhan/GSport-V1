@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { UserRoutes } from "./routes/UserRoutes";
 import React, { useEffect, useState } from "react";
 import { OrganizerRoutes } from "./routes/OrganizerRoutes";
+import { PlayerRoutes } from "./routes/PlayerRoutes";
 
 const App = () => {
   const [auth, setAuth] = useState(false);
@@ -28,7 +29,8 @@ const App = () => {
     },
 
    UserRoutes,
-   OrganizerRoutes
+   OrganizerRoutes,
+   PlayerRoutes
   ]);
 
   return (

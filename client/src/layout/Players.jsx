@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import Navbar  from "../components/Navbar";
 import Sidebar  from "../components/Sidebar";
 
-const Organizers = () => {
+const Players = () => {
   return (
     <div className="w-full border-solid bg-gray-100 ">
       <div className="pl-[23rem]">
@@ -32,4 +32,4 @@ const Organizers = () => {
   );
 };
 
-export default Organizers;
+export default Players;

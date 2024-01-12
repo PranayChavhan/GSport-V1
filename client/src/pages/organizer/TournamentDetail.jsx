@@ -5,11 +5,9 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card, Typography } from "@material-tailwind/react";
 import { FaUndoAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-import axios from "axios";
-import { w3cwebsocket as W3CWebSocket } from "websocket";
 
 const TABLE_HEAD = ["Team", "Matches", "Win", "Loose", "Points"];
-const TABLE_HEAD2 = ["Player", "College"];
+
 const TournamentDetail = () => {
   const [org, setOrg] = useState([]);
   const [commentry, setCommentry] = useState([]);
@@ -19,9 +17,13 @@ const TournamentDetail = () => {
   const [isStarted, setIsStarted] = useState(true);
   const [isRegistered, setIsRegistered] = useState(false);
   const [tData, setTData] = useState([]);
-  const [matchFinish, setMatchFinish] = useState(false);
   const navigate = useNavigate();
   const [adminComment, setAdminComment] = useState("");
+  let { id } = useParams();
+  let initialDuration = 20;
+
+  const [timer, setTimer] = useState(initialDuration);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   useEffect(() => {
     const getCookie = (name) => {
@@ -54,13 +56,15 @@ const TournamentDetail = () => {
     }
   }, []);
 
-  let { id } = useParams();
   useEffect(() => {
     const fetchTournamentData = async () => {
       try {
         const url = `tournaments/${id}`;
         const data = await getRequest(url);
         setOrg(data.data);
+        console.log('====================================');
+        console.log(data);
+        console.log('====================================');
 
         if (data.data.organizer_id === userData.id) {
           setIsAdmin(true);
@@ -79,34 +83,10 @@ const TournamentDetail = () => {
       } catch (error) {
         console.error("Error fetching tournament data:", error);
       }
-
-
     };
-
-
-    console.log('====================================');
-    console.log("hello");
-    console.log('====================================');
-    
     const intervalId = setInterval(fetchTournamentData, 1000);
     return () => clearInterval(intervalId);
-
-
-
   }, [id, token, userData.id]);
-
-
-
-
-
-
-
-
-
-  let initialDuration = 20;
-
-  const [timer, setTimer] = useState(initialDuration);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   useEffect(() => {
     let countdown;
@@ -153,24 +133,6 @@ const TournamentDetail = () => {
     return schedule;
   }
   const matchSchedule = generateMatchSchedule(tData);
-
-  // const upDateWinner = (team_id) => {
-  //   const jsonData = {
-  //     matches:  1,
-  //   };
-  //   patchRequest(`/players/create_team/${team_id} `, jsonData, token)
-  //     .then((data) => {
-  //     })
-  //     .catch((error) => {
-  //       if (error.response && error.response.status === 400) {
-  //         console.error("API error");
-
-  //       } else {
-  //         console.error("API error:", error);
-  //       }
-  //     });
-  // };
-
   const [player1Score, setPlayer1Score] = useState(0);
   const [player2Score, setPlayer2Score] = useState(0);
 
@@ -197,17 +159,14 @@ const TournamentDetail = () => {
             progress: undefined,
             theme: "light",
           });
-
-          console.log("====================================");
-          console.log(
-            `${team_name} from ${team_collegeName} scores 1 score. Now total score of ${team_name} is ${jsonData.score}`
-          );
-          console.log("====================================");
-
           const jsonString = {
-            comment: `${team_name} from ${team_collegeName} scores 1 score. Now total score of ${team_name} is ${jsonData.score}`
-          }
-          postRequest(`/organizer/tournament/${id}/comments`, jsonString, token)
+            comment: `${team_name} from ${team_collegeName} scores 1 score. Now total score of ${team_name} is ${jsonData.score}`,
+          };
+          postRequest(
+            `/organizer/tournament/${id}/comments`,
+            jsonString,
+            token
+          );
         }
       })
       .catch((error) => {
@@ -229,16 +188,14 @@ const TournamentDetail = () => {
       });
   };
 
-
-  const handleComment = ()=>{
-
+  const handleComment = () => {
     const jsonString = {
-      comment: adminComment
-    }
-    postRequest(`/organizer/tournament/${id}/comments`, jsonString, token)
+      comment: adminComment,
+    };
+    postRequest(`/organizer/tournament/${id}/comments`, jsonString, token);
 
     setAdminComment("");
-  }
+  };
 
   const decrementScore = (player) => {
     if (player === "player1" && player1Score > 0) {
@@ -300,7 +257,7 @@ const TournamentDetail = () => {
               <div className="sm:w-1/3 text-center sm:pr-8 sm:py-8">
                 <div className="flex flex-col items-center text-center justify-center">
                   <h2 className="font-medium title-font text-gray-900 text-lg">
-                    {org.organizer_name}
+                    {org.organizer_name} 
                   </h2>
                   <div className="w-12 h-1 bg-yellow-500 rounded mt-2 mb-4"></div>
 
@@ -922,35 +879,28 @@ const TournamentDetail = () => {
               </table>
             </Card>
 
-
-
-
             <div className="border-t border-gray-400 mt-20 py-10">
-          <div className="relative mb-4">
-            <label className="leading-7 text-sm text-gray-600">Commentry</label>
-            <textarea
-             value={adminComment}
-             onChange={(e) => setAdminComment(e.target.value)}
-              id="message"
-              name="message"
-              className="w-full bg-white rounded border border-gray-300  focus:ring-2 focus:ring-orange-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
-            ></textarea>
+              <div className="relative mb-4">
+                <label className="leading-7 text-sm text-gray-600">
+                  Commentry
+                </label>
+                <textarea
+                  value={adminComment}
+                  onChange={(e) => setAdminComment(e.target.value)}
+                  id="message"
+                  name="message"
+                  className="w-full bg-white rounded border border-gray-300  focus:ring-2 focus:ring-orange-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
+                ></textarea>
+              </div>
+              <button
+                onClick={handleComment}
+                className="text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded-md text-lg"
+              >
+                Comment
+              </button>
+            </div>
           </div>
-          <button
-          onClick={handleComment}
-           className="text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded-md text-lg">
-            Comment
-          </button>
         </div>
-        
-
-
-
-          </div>
-        
-        </div>
-
-        
       </section>
     </div>
   );

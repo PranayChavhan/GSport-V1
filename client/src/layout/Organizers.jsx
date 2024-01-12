@@ -1,8 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Outlet } from "react-router-dom";
-import Footer from "../components/Footer";
 import Navbar  from "../components/Navbar";
-import Sidebar  from "../components/Sidebar";
+import Sidebar  from "../components/OSidebar";
 
 const Organizers = () => {
   return (
@@ -25,9 +24,7 @@ const Organizers = () => {
           </div>
           
       </div>
-      <div className="pl-[21.3rem]">
-      <Footer/>
-      </div>
+     
     </div>
   );
 };

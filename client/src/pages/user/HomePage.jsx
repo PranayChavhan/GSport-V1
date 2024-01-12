@@ -17,10 +17,10 @@ import { Link } from "react-router-dom";
 
 const HomePage = () => {
   return (
-    <div className="w-full bg-gray-100 min-h-screen">
+    <div className="w-full bg-gray-100  mb-10">
       
       
-    <div className="container mx-auto mt-16 px-4 flex flex-col items-center">
+    <div className=" mx-auto md:mt-16 px-4 flex flex-col items-center -mt-10">
       <Typography variant="h1" color="blue-gray" className="text-center text-3xl lg:text-3xl xl:text-4xl">
         Enter your Arena
       </Typography>

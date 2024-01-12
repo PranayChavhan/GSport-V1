@@ -85,15 +85,15 @@ function TournamentsUpdate() {
           >
             <div className="flex items-center justify-center gap-2">
               <div
-                className={`rounded-full ${item.iconBg} w-10 h-10 flex items-center justify-center text-white text-xl`}
+                className={`rounded-full ${item.iconBg} md:w-10 md:h-10 h-6 w-6 flex items-center justify-center text-white text-xl`}
               >
                 <item.icon />
               </div>
-              <h1 className={`${item.textColor} capitalize text-lg`}>
+              <h1 className={`${item.textColor} capitalize text-sm md:text-lg`}>
                 {item.label}
               </h1>
             </div>
-            <h1 className={`${item.textColor} text-4xl pl-2 font-bold`}>
+            <h1 className={`${item.textColor} md:text-4xl text-2xl pl-2 font-bold`}>
               {item.heading}
             </h1>
             <p className={`${item.textColor} text-sm`}>{item.subheading}</p>
@@ -139,7 +139,7 @@ function Team() {
   );
 }
 
-const OTournamentTracking = () => {
+const PTournamentTracking = () => {
   const [tournament, setTournament] = useState([]);
 
   useEffect(() => {
@@ -156,26 +156,32 @@ const OTournamentTracking = () => {
     fetchTournamentData();
   }, []);
 
-
+  console.log("====================================");
+  console.log(tournament);
+  console.log("====================================");
+  
   const navigate = useNavigate();
+
+  const [userData, setUserData] = useState("");
   const [org, setOrg] = useState([]);
   const [dueDate, setDueDate] = useState(null);
 
   useEffect(() => {
-    
-    const fetchTournamentData = async () => {
-      let uid
-      const userDataString = localStorage.getItem("userData");
+    const userDataString = localStorage.getItem("userData");
     if (userDataString) {
       try {
         const userDataObject = JSON.parse(userDataString);
-        uid = userDataObject.id
+        setUserData(userDataObject);
       } catch (error) {
         console.error("Error parsing userData:", error);
       }
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchTournamentData = async () => {
       try {
-        const url = `tournaments/userid/${uid}`;
+        const url = `tournaments/userid/${userData.id}`;
         const data = await getRequest(url);
         setOrg(data.data);
       } catch (error) {
@@ -183,13 +189,12 @@ const OTournamentTracking = () => {
       }
     };
     fetchTournamentData();
-  }, []);
-
+  }, [userData.id]);
 
   return (
     <div className="w-full min-h-screen flex flex-col gap-5 ">
-      <section className="text-gray-600 body-font my-10 mr-6">
-        <div className="">
+      <section className="text-gray-600 body-font md:my-10 mr-6">
+        <div className="hidden md:block">
           <div className=" flex flex-col sm:flex-row sm:items-center items-start mx-auto">
             <h1 className="flex-grow sm:pr-16 text-2xl font-medium title-font text-gray-900">
               Elevate your sporting events with seamless tournament creation and
@@ -216,7 +221,7 @@ const OTournamentTracking = () => {
             <TournamentsUpdate/>
 
             <div className="w-full flex justify-between py-4">
-              <p className="text-xl md:text-2xl font-bold text-blue-gray-700">
+              <p className="text-lg md:text-2xl font-bold text-blue-gray-700">
                 Tournament details
               </p>
               <div className="flex space-x-4 text-blue-gray-700">
@@ -271,7 +276,9 @@ const OTournamentTracking = () => {
           </Tabs>
 
           
-          <div className="text-sm z-50  rounded-lg flex justify-center items-center gap-2">
+
+          
+          {/* <div className="text-sm z-50  rounded-lg lg:flex justify-center items-center gap-2 hidden md:block">
                 <p className="text-xs ">Sort by: Due date</p>
                 <input 
                     type="date"
@@ -281,7 +288,7 @@ const OTournamentTracking = () => {
                     name="birthday" 
                     className=" px-4 py-2 z-50 rounded-lg border focus:outline-none  focus:border-orange-500 focus:ring-2 focus:ring-orange-200 text-xs md:text-normal"
                 />
-            </div>
+            </div> */}
         </div>
 
 
@@ -289,7 +296,7 @@ const OTournamentTracking = () => {
                     
                   </div>
                 </CardHeader>
-                <CardBody className="overflow-hidden px-0">
+                <CardBody className=" px-0 overflow-scroll">
                   <table className="w-full min-w-max table-auto text-left">
                     <thead>
                       <tr>
@@ -310,20 +317,20 @@ const OTournamentTracking = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {org.map((row, index) => (
+                      {tournament.map((row, index) => (
                         <tr
                           key={index}
                           className="hover:bg-gray-100 transition-all cursor-pointer"
                           onClick={() =>
                             navigate(
-                              `/organizer/tournament-details/${row.id}`
+                              `/player/tournament-details/${row.id}`
                             )
                           }
                         >
                           <td className="py-4 px-4 border-b">
                             <div className="flex items-center gap-3">
                               <Avatar
-                                src={`http://127.0.0.1:8000/organizer/images/${row.image}`}
+                                src={`http://192.168.43.10:1234/organizer/images/${row.image}`}
                                 alt={row.name}
                                 size="sm"
                                 className="mr-8"
@@ -400,4 +407,4 @@ const OTournamentTracking = () => {
   );
 };
 
-export default OTournamentTracking;
+export default PTournamentTracking;

@@ -1,6 +1,9 @@
 import ErrorPage from "../error-page"
 import Players from "../layout/Players"
-import ODashboard from "../pages/organizer/ODashboard"
+import OCalendar from "../pages/organizer/OCalendar"
+import PDashboard from "../pages/player/PDashboard"
+import PTournamentTracking from "../pages/player/PTournamentTracking"
+import TournamentDetail from "../pages/player/TournamentDetail"
 
 
 
@@ -14,8 +17,20 @@ export const PlayerRoutes = {
     children: [     
         { 
             path: "dashboard",
-            element: <ODashboard/>,
+            element: <PDashboard/>,
         },
+        {
+            path: "calendar",
+            element: <OCalendar/>
+        },
+        {
+            path: "tournament-tracking",
+            element: <PTournamentTracking/>
+        },
+        { 
+            path: "tournament-details/:id",
+            element: <TournamentDetail/>
+          },
         
     ]
     

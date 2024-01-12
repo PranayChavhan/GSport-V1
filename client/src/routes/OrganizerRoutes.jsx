@@ -17,7 +17,7 @@ import OMessages from "../pages/organizer/OMessages"
 import ORegistration from "../pages/organizer/ORegistration"
 import OrgDetails from "../pages/organizer/OrgDetails"
 import OTournamentTracking from "../pages/organizer/OTournamentTracking"
-import OWishlist from "../pages/organizer/OWishlist"
+
 import RegistrationProcess from "../pages/organizer/RegistrationProcess"
 import TournamentDetail from "../pages/organizer/TournamentDetail"
 import YourOrg from "../pages/organizer/YourOrg"
@@ -41,10 +41,6 @@ export const OrganizerRoutes = {
         { 
             path: "messages",
             element: <OMessages/>,
-        },
-        { 
-          path: "wishlist",
-          element: <OWishlist/>,
         },
         { 
             path: "registration",

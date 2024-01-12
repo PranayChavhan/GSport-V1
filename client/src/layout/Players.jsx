@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { Outlet } from "react-router-dom";
-import Footer from "../components/Footer";
+import BottomNav from "../components/BottoNav";
 import Navbar  from "../components/Navbar";
-import Sidebar  from "../components/Sidebar";
+import Sidebar  from "../components/USidebar";
 
 const Players = () => {
   return (
     <div className="w-full border-solid bg-gray-100 ">
-      <div className="pl-[23rem]">
+      <div className="md:pl-[23rem]">
       <Navbar />
       </div>
       <div className="flex h-full w-full bg-gray-100">
@@ -20,13 +20,14 @@ const Players = () => {
           <Sidebar /> 
         </div>
 
-          <div className=" w-full h-full p-5 bg-gray-100  font-poppins pl-[23rem] pt-[7rem] ">
+          <div className=" w-full h-full md:p-5 p-4 bg-gray-100  font-poppins md:pl-[23rem] md:pt-[7rem] mb-20">
             <Outlet />
           </div>
           
       </div>
-      <div className="pl-[21.3rem]">
-      <Footer/>
+      
+      <div className="md:hidden">
+      <BottomNav/>
       </div>
     </div>
   );

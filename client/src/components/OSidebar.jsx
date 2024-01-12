@@ -28,28 +28,28 @@ const sidebarItems = [
     label: "Calendar",
     hasSuffix: false,
   },
-  {
-    linkTo: "registration",
-    icon: UsersIcon,
-    label: "Registrations",
-    hasSuffix: false,
-  },
-  {
-    linkTo: "wishlist",
-    icon: InboxIcon,
-    label: "Wishlist",
-    hasSuffix: false,
-  },
+  // {
+  //   linkTo: "registration",
+  //   icon: UsersIcon,
+  //   label: "Registrations",
+  //   hasSuffix: false,
+  // },
   {
     linkTo: "tournament-tracking",
     icon: FolderIcon,
-    label: "Manage Listings",
+    label: "Tournament tracking",
+    hasSuffix: false,
+  },
+  {
+    linkTo: "messages",
+    icon: UsersIcon,
+    label: "Teams",
     hasSuffix: false,
   },
   {
     linkTo: "messages",
     icon: InboxIcon,
-    label: "Settigngs",
+    label: "Messages",
     hasSuffix: false,
   },
 ];

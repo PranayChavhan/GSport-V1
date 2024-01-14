@@ -1,3 +1,6 @@
+import asyncio
+from twilio.rest import Client
+from django.conf import settings
 from fastapi import APIRouter, status, HTTPException, Response, Form
 from models.index import ORGANIZERS, DOCUMENTS, USERS
 from schemas.index import Organizer, Document, Login, User, GenericResponseModel
@@ -12,6 +15,9 @@ import shortuuid
 import http
 from utils.general import model_to_dict
 import httpx
+from typing import Dict
+from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
 # from fastapi_pagination import LimitOffsetPage, Page
 # from fastapi_pagination.ext.sqlalchemy import paginate
 
@@ -19,37 +25,58 @@ import httpx
 userRouter = APIRouter()
 
 import random
+import string
 
-# Replace this with a secure way to generate and store OTPs in a real-world scenario
-def generate_otp():
-    return str(random.randint(100000, 999999))
+# Replace these values with your actual Twilio Account SID, Auth Token, and Phone Number
+TWILIO_ACCOUNT_SID = "AC72b3ce65db8944f030eac41796c4b1b8"
+TWILIO_AUTH_TOKEN = "4d82ffe9acdada0e3fbeb267bdb5a4c0"
+TWILIO_PHONE_NUMBER = "+19362255631"
 
-@userRouter.post("/send_otp")
-async def send_otp(mobile: str = Form(...)):
-    AUTH_TOKEN = "1651|TW6YbFnKwTgOHBUiGgxsD2LiV4pmEfYOADcQlKO7 "
-    API_URL = "https://sms.send.lk/api/v3/sms/send"
+# In-memory storage for OTPs (replace with a proper database in production)
+otp_storage: Dict[str, str] = {}
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+def generate_otp(length=6):
+    return ''.join(random.choices(string.digits, k=length))
+
+async def send_otp(to_number, otp):
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+    body = f"Your OTP for verification is: {otp}"
+
+    return client.messages.create(
+        from_=TWILIO_PHONE_NUMBER,
+        to=to_number,
+        body=body
+    )
+
+def verify_otp(phone: str, otp: str):
+    stored_otp = otp_storage.get(phone)
+    return stored_otp and stored_otp == otp
+
+@userRouter.post('/send_otp')
+async def send_otp_route(phone: str):
     otp = generate_otp()
-    message = f"Your OTP for verification is: {otp}"
+    otp_storage[phone] = otp
 
-    msg_data = {
-        "recipient": mobile,
-        "sender_id": "SendTest",
-        "message": message
-    }
-    headers = {
-        "accept": "application/json",
-        "Authorization": "Bearer 1651|TW6YbFnKwTgOHBUiGgxsD2LiV4pmEfYOADcQlKO7",
-    }
-    
+    await send_otp(phone, otp)
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post(API_URL, data=msg_data, headers=headers)
+    return {"message": "OTP sent successfully", "otp": otp}
 
-        if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=f"Request failed with status code: {response.status_code}")
+@userRouter.post('/verify_otp')
+async def verify_otp_route(phone: str, otp: str):
+    if verify_otp(phone, otp):
+        # If OTP is valid, you might generate a JWT token for authentication
+        # Here, I'm returning a simple message
+        return {"message": "OTP verified successfully"}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid OTP")
 
-        return {"message": "OTP sent successfully", "otp": otp}
 
 @userRouter.get('/')
 async def fetch_all_users(db: Session = Depends(get_db)):

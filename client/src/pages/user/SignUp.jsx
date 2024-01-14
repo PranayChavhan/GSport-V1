@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
-import { postRequest } from "../../api/api";
-
+import React, { useState, useRef } from 'react';
+import { postRequest, postRequestNoToken } from "../../api/api";
+import { MdVerified } from "react-icons/md";
 import {
   Card,
   Input,
@@ -25,6 +25,27 @@ const SignUp = () => {
   const [passwordError, setPasswordError] = useState("");
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [checkboxError, setCheckboxError] = useState("");
+  const [inputValue, setInputValue] = useState(Array(6).fill(''));
+  const inputRefs = useRef(Array(6).fill(null));
+  const [isVerified, setIsVerified] = useState(false);
+const [isSend, setIsSend] = useState(false);
+  const handleInputChange = (e, index) => {
+    const value = e.target.value;
+
+    // Ensure that the entered value is a digit
+    if (/^\d?$/.test(value)) {
+      const updatedValue = [...inputValue];
+      updatedValue[index] = value;
+      setInputValue(updatedValue);
+
+      // Move the cursor to the next input field
+      if (index < inputRefs.current.length - 1 && value !== '') {
+        inputRefs.current[index + 1].focus();
+      }
+    }
+  };
+
+  const combinedDigits = inputValue.join('');
 
   function validateEmail(email) {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -131,9 +152,82 @@ const SignUp = () => {
     }
   }
 
+
+
+  const handleOTP = (e)=>{
+    e.preventDefault();
+    postRequestNoToken(`/users/send_otp?phone=%2B91${mobileNumber}`)
+        .then((data) => {
+          // Handle a successful API response here
+          console.log("API response:", data);
+          toast.success("OTP send successfully!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+
+          setIsSend(true);
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 400) {
+            // Handle the specific 400 error with the "User with this email or phone already exists" message.
+            console.error(
+              "API error: User with this email or phone already exists"
+            );
+            toast.error("An error occurred. Please try again.", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          } else {
+            // Handle other API errors
+            console.error("API error:", error);
+            // You can handle other errors or set an appropriate error state.
+          }
+        });
+
+
+  }
+
+
+  const handleVerify = (e)=>{
+    e.preventDefault();
+    postRequestNoToken(`/users/verify_otp?phone=%2B91${mobileNumber}&otp=${combinedDigits}`)
+        .then((data) => {
+          console.log("API response:", data);
+         
+
+          setIsVerified(true);
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 400) {
+            // Handle the specific 400 error with the "User with this email or phone already exists" message.
+            console.error(
+              "API error: User with this email or phone already exists"
+            );
+           
+          } else {
+            // Handle other API errors
+            console.error("API error:", error);
+            // You can handle other errors or set an appropriate error state.
+          }
+        });
+
+  }
+
   return (
     <div>
-      <section className="text-gray-400 bg-gray-900 body-font relative h-full">
+      <section className="text-gray-400 bg-gray-900 body-font relative h-full ">
         <div className="absolute inset-0 h-full">
           <div className=" h-full">
             <img
@@ -148,7 +242,7 @@ const SignUp = () => {
           GSort
         </p>
 
-        <div className="container lg:py-[36px] mx-auto flex">
+        <div className="container lg:py-[36px] mx-auto flex mt-1">
           <div className="lg:w-1/3 md:w-1/2 bg-white shadow-md rounded-lg p-5  flex flex-col justify-center items-center md:ml-auto md:mt-0 relative z-10">
             <Card className="p-5" color="transparent" shadow={false}>
               <Typography variant="h4" color="blue-gray">
@@ -208,21 +302,89 @@ const SignUp = () => {
                   >
                     Mobile Number
                   </Typography>
+                  <div className="flex flex-row items-center gap-2">
                   <Input
                     size="lg"
                     placeholder="7774860123"
-                    className=" !border-t-blue-gray-200 focus:!border-gray-500"
+                    className=" !border-t-blue-gray-200 focus:!border-gray-500 w-[100%]"
                     labelProps={{
                       className: "before:content-none after:content-none",
                     }}
                     value={mobileNumber}
                     onChange={(e) => setMobileNumber(e.target.value)}
                   />
+
+                  <button
+                  onClick={handleOTP}
+                   className="bg-orange-500 px-4 py-3 rounded-md text-white font-semibold text-sm w-[50%]"><p>Generate OTP</p></button>
+                 
+                  </div>
                   {mobileNumberError && (
                     <p className="text-red-500 text-[12px]">
                       {mobileNumberError}
                     </p>
                   )}
+
+                  {
+                    isSend ?
+                    <>
+                    <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className="-mb-3 text-sm"
+                  >
+                     Enter 6-Digit OTP:
+                  </Typography>
+                  <div className="mb-4 flex gap-2">
+      {Array.from({ length: 6 }, (_, index) => (
+        <input
+          key={index}
+          type="text"
+          id={`digit-${index + 1}`}
+          name={`digit-${index + 1}`}
+          value={inputValue[index]}
+          onChange={(e) => handleInputChange(e, index)}
+          className="flex-1 p-2 border rounded-md focus:outline-none text-center w-10 bg-gray-200"
+          maxLength="1"
+          pattern="\d"
+          title="Please enter a digit."
+          required
+          ref={(input) => (inputRefs.current[index] = input)}
+        />
+      ))}
+    </div>
+                    </>
+                    :
+                    null
+                  }
+
+{
+  isVerified ?
+  <>
+  <Typography
+                    variant="h2"
+                    color="green"
+                    className="-mt-4 text-md flex flex-row items-center justify-center gap-2"
+                  >
+                    <p className='text-green-500'><MdVerified size={20} /></p>
+                   Mobile number verified
+                  </Typography>
+  </>
+  :
+  <>
+   {
+    isSend ?
+    <>
+    <button
+                  onClick={handleVerify}
+                   className="bg-orange-500 px-4 py-3 rounded-md text-white font-semibold text-sm"><p>Verify</p></button>
+                 
+                 </>
+    :
+    null
+   }
+  </>
+}
                   <Typography
                     variant="h6"
                     color="blue-gray"

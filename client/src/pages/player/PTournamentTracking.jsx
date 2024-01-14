@@ -27,7 +27,7 @@ import moment from "moment";
 import { getRequest } from "../../api/api";
 import { MdNewLabel } from "react-icons/md";
 import { BsPlayFill, BsCheck2Circle } from "react-icons/bs";
-const TABLE_HEAD = ["Tournaments", "Start Date", "Due Date", "Team", "Edit"];
+const TABLE_HEAD = ["Tournaments", "Start Date", "Due Date", "Team"];
 
 const TABS = [
   {
@@ -384,15 +384,11 @@ const PTournamentTracking = () => {
                             </Typography>
                           </td>
 
-                          <td className="border-b">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-normal flex items-center ml-4"
-                            >
-                              <p>{row.organizer_name}</p>
-                            </Typography>
-                          </td>
+                          {/* <td className="border-b">
+                          <button className="bg-orange-400 px-4 py-2 rounded-lg text-white text-sm hover:bg-orange-600">
+                            Edit
+                           </button>
+                          </td> */}
                         </tr>
                       ))}
                     </tbody>

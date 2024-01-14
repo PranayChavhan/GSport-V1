@@ -24,6 +24,16 @@ export async function postRequest(URL, payload, queryParams = {}) {
   }
 }
 
+export async function postRequestNoToken(URL) {
+  try {
+
+    const response = await axiosClient.post(URL);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function patchRequest(URL, payload, queryParams = {}) {
   try {
     const query = new URLSearchParams(queryParams); 

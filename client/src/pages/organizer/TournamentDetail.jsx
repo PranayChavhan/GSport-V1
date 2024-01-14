@@ -9,6 +9,8 @@ import { toast } from "react-toastify";
 const TABLE_HEAD = ["Team", "Matches", "Win", "Loose", "Points"];
 
 const TournamentDetail = () => {
+  const [commentVisible, setCommentVisible] = useState(true);
+  const [squadVisible, setSquadVisible] = useState(false);
   const [org, setOrg] = useState([]);
   const [commentry, setCommentry] = useState([]);
   const [userData, setUserData] = useState("");
@@ -72,6 +74,7 @@ const TournamentDetail = () => {
           setIsAdmin(false);
         }
         setCommentry(data.data.commentry);
+
         const teamData = await getRequest(
           `players/team/tournament_id/${id}?token=${token}`
         );
@@ -86,7 +89,9 @@ const TournamentDetail = () => {
     };
     const intervalId = setInterval(fetchTournamentData, 1000);
     return () => clearInterval(intervalId);
-  }, [id, token, userData.id]);
+  }, [commentry, id, token, userData.id]);
+
+
 
   useEffect(() => {
     let countdown;
@@ -250,7 +255,7 @@ const TournamentDetail = () => {
               <img
                 alt="content"
                 className="object-cover object-center h-full w-full"
-                src={`http://127.0.0.1:8000/organizer/images/${org.image}`}
+                src={`http://192.168.43.10:1234/organizer/images/${org.image}`}
               />
             </div>
             <div className="flex flex-col sm:flex-row">
@@ -593,11 +598,52 @@ const TournamentDetail = () => {
                   ))}
 
                   <div>
-                    <p>Commentry</p>
+                    
+                    
+
+                    <div className="flex flex-row gap-4 mb-4 ">
+                      <button
+                        className={`${
+                          commentVisible
+                            ? "bg-orange-400 md:p-3 p-2 rounded-xl "
+                            : "p-3"
+                        } `}
+                        onClick={() => {
+                          if (commentVisible == false) {
+                            setCommentVisible(true);
+                            setSquadVisible(false);
+                            
+                          } else setCommentVisible(true);
+                        }}
+                      >
+                        <p className="md:text-md text-[12px]">Commentry</p>
+                      </button>
+
+                      <button
+                        className={`${
+                          squadVisible ? "bg-orange-400 md:p-3 p-2 rounded-xl " : "p-3"
+                        } `}
+                        onClick={() => {
+                          if (squadVisible == false) {
+                            setCommentVisible(false);
+                            
+                            setSquadVisible(true);
+                          } else setSquadVisible(true);
+                        }}
+                      >
+                        <p className="md:text-md text-[12px]">Squads</p>
+                      </button>
+
+                      
+                    </div>
 
                     {commentry.map((item, index) => (
                       <div key={index}>
-                        <div className="bg-gray-50 my-2 text-gray-800  p-4 rounded-2xl text-[14px] flex flex-row justify-between items-center">
+                       {
+                        item.comment ?
+
+                        <>
+                         <div className="bg-gray-50 my-2 text-gray-800  p-4 rounded-2xl text-[14px] flex flex-row justify-between items-center">
                           <p>{item.comment}</p>
 
                           <p className="text-xs text-gray-600">
@@ -609,6 +655,10 @@ const TournamentDetail = () => {
                             })}
                           </p>
                         </div>
+                        </>
+                        :
+                        <>he</>
+                       }
                       </div>
                     ))}
                   </div>

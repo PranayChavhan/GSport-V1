@@ -6,6 +6,8 @@ import { Card, Typography } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 
 const TABLE_HEAD = ["Team", "Matches", "Win", "Loose", "Points"];
+const TABLE_HEAD2 = ["Player", "College", "Email", "Team", "Action"];
+
 
 const TournamentDetail = () => {
   const [org, setOrg] = useState([]);
@@ -70,7 +72,10 @@ const TournamentDetail = () => {
         } else {
           setIsAdmin(false);
         }
-        setCommentry(data.data.commentry);
+
+        if (data.data.commentry) {
+          setCommentry(data.data.commentry);
+        }
         const teamData = await getRequest(
           `players/team/tournament_id/${id}?token=${token}`
         );
@@ -405,7 +410,7 @@ const TournamentDetail = () => {
                       <button
                         className={`${
                           commentVisible
-                            ? "bg-orange-400 md:p-3 p-2 rounded-xl "
+                            ? "bg-orange-400 md:p-3 p-2 rounded-xl text-white "
                             : "p-3"
                         } `}
                         onClick={() => {
@@ -421,7 +426,7 @@ const TournamentDetail = () => {
 
                       <button
                         className={`${
-                          squadVisible ? "bg-orange-400 md:p-3 p-2 rounded-xl " : "p-3"
+                          squadVisible ? "bg-orange-400 md:p-3 p-2 rounded-xl text-white " : "p-3"
                         } `}
                         onClick={() => {
                           if (squadVisible == false) {
@@ -436,7 +441,7 @@ const TournamentDetail = () => {
 
                       <button
                         className={` md:hidden ${
-                          pointsTable ? "bg-orange-400 md:p-3 p-2 rounded-xl " : "p-3"
+                          pointsTable ? "bg-orange-400 md:p-3 p-2 rounded-xl text-white " : "p-3"
                         } `}
                         onClick={() => {
                           if (pointsTable == false) {
@@ -453,113 +458,120 @@ const TournamentDetail = () => {
                     {commentVisible ? (
                       <>
                         {commentry.map((item, index) => (
-                          <div key={index}>
-                            <div className="bg-white my-2 text-gray-800  p-4 rounded-2xl md:text-[14px] text-[12px] flex flex-row justify-between items-center gap-4">
-                              <p>{item.comment}</p>
+                      <div key={index}>
+                       {
+                        item.comment ?
 
-                              <p className="md:text-xs text-[9px] text-gray-600">
-                                {new Date(item.createdAt).toLocaleString(
-                                  "en-US",
-                                  {
-                                    hour: "numeric",
-                                    minute: "numeric",
-                                    second: "numeric",
-                                    hour12: true,
-                                  }
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                        <>
+                         <div className="bg-gray-50 my-2 text-gray-800  p-4 rounded-2xl text-[14px] flex flex-row justify-between items-center">
+                          <p>{item.comment}</p>
+
+                          <p className="text-xs text-gray-600">
+                            {new Date(item.createdAt).toLocaleString("en-US", {
+                              hour: "numeric",
+                              minute: "numeric",
+                              second: "numeric",
+                              hour12: true,
+                            })}
+                          </p>
+                        </div>
+                        </>
+                        :
+                        null
+                       }
+                      </div>
+                    ))}
                       </>
                     ) : null}
                     {squadVisible ? (
                       <>
-                        <Card className=" w-full overflow-hidden">
-                          <table className="w-full min-w-max table-auto text-left">
-                            <thead>
-                              <tr>
-                                {TABLE_HEAD.map((head) => (
-                                  <th
-                                    key={head}
-                                    className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
-                                  >
-                                    <Typography
-                                      variant="small"
-                                      color="blue-gray"
-                                      className="font-normal leading-none opacity-70"
-                                    >
-                                      {head}
-                                    </Typography>
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
+                        <div className=" w-full overflow-hidden">
+                          
                               {tData.map(
                                 (
-                                  { name, matches, win, loose, points },
+                                  {team_players, name  },
                                   index
                                 ) => (
-                                  <tr
-                                    key={name}
-                                    className="even:bg-blue-gray-50/50"
-                                  >
-                                    <td className="p-4">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                      >
-                                        {name}
-                                      </Typography>
-                                    </td>
-                                    <td className="p-4">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                      >
-                                        {matches}
-                                      </Typography>
-                                    </td>
-                                    <td className="p-4">
-                                      <Typography
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-normal"
-                                      >
-                                        {win}
-                                      </Typography>
-                                    </td>
-                                    <td className="p-4">
-                                      <Typography
-                                        as="a"
-                                        href="#"
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-medium"
-                                      >
-                                        {loose}
-                                      </Typography>
-                                    </td>
-                                    <td className="p-4">
-                                      <Typography
-                                        as="a"
-                                        href="#"
-                                        variant="small"
-                                        color="blue-gray"
-                                        className="font-medium"
-                                      >
-                                        {points}
-                                      </Typography>
-                                    </td>
-                                  </tr>
+                                  <div key={index}>
+
+                                    
+
+{
+                        team_players.map((items, index)=>(
+
+                          <tr
+                                  key={index}  
+                          className="bg-white rounded-md shadow-sm flex items-center justify-evenly mb-4"
+                        >
+
+                          <td className="p-4">
+
+                          <div className="rounded-full h-10 overflow-hidden">
+              <img
+                alt="content"
+                className="object-cover object-center h-full w-full"
+                src={items.player.profile_url}
+              />
+            </div>
+                            
+                          </td>
+                          <td className="p-4">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              {items.player.full_name}
+                            </Typography>
+                          </td>
+                          <td className="p-4">
+                            <Typography
+                              variant="small"
+                              color="blue-gray"
+                              className="font-normal"
+                            >
+                              {items.player.college}
+                            </Typography>
+                          </td>
+                          <td className="p-4">
+                            <Typography
+                              as="a"
+                              href="#"
+                              variant="small"
+                              color="blue-gray"
+                              className="font-medium"
+                            >
+                              {items.player.email_id}
+                            </Typography>
+                          </td>
+                          <td className="p-4">
+                            <Typography
+                              as="a"
+                              href="#"
+                              variant="small"
+                              color="blue-gray"
+                              className="font-medium"
+                            >
+                              {name}
+                            </Typography>
+                          </td>
+
+                          {/* <td className="p-4">
+                           <button className="bg-orange-400 px-4 py-2 rounded-lg text-white text-sm hover:bg-orange-600">
+                            Refund
+                           </button>
+                          </td> */}
+                        </tr>
+                        ))
+                      }
+
+
+                                 
+                                  </div>
                                 )
                               )}
-                            </tbody>
-                          </table>
-                        </Card>
+                           
+                        </div>
                       </>
                     ) : null}
 
@@ -712,8 +724,13 @@ const TournamentDetail = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tData.map(({ name, matches, win, loose, points }, index) => (
+                 
+                  {tData.map(({ name, matches, win, loose, points, team_players }, index) => (
+                    
                     <tr key={name} className="even:bg-blue-gray-50/50">
+                      
+
+                     
                       <td className="p-4">
                         <Typography
                           variant="small"

@@ -121,10 +121,11 @@ class TournamentService():
             .options(
                 joinedload(TOURNAMENT.commentry)
             )
-            .join(COMMENTRY, TOURNAMENT.id == COMMENTRY.tournament_id)
+            .outerjoin(COMMENTRY, TOURNAMENT.id == COMMENTRY.tournament_id)  # Use outer join
             .filter(TOURNAMENT.id == tournament_id)
             .first()
         )
+
         if data is None:
             return GenericResponseModel(status='error', message='Tournament not found or invalid data', status_code=http.HTTPStatus.BAD_REQUEST)
         return {'status': 'success', 'data': data, 'message': 'Tournament details found', 'status_code':http.HTTPStatus.ACCEPTED}

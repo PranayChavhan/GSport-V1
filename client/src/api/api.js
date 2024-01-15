@@ -28,11 +28,23 @@ export async function postRequestNoToken(URL) {
   try {
 
     const response = await axiosClient.post(URL);
+
     return response.data;
   } catch (error) {
     throw error;
   }
 }
+
+export async function postRequestJson(URL, payload) {
+  try {
+    const response = await axiosClient.post(URL, payload);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
 
 export async function patchRequest(URL, payload, queryParams = {}) {
   try {

@@ -22,8 +22,7 @@ class Message(BaseModel):
 class User(BaseModel):
     email_id: str
     full_name: str
-    phone_no: str
-    password: str
+    phone_no:str
 
 class Player(BaseModel):
     name: str
@@ -94,8 +93,9 @@ class TokenPayload(BaseModel):
     exp: int = None
 
 class Login(BaseModel):
-    email_id: str
-    password: str
+    # email_id: str
+    # password: str
+    phone_no: int
 
 class GenericResponseModel(BaseModel):
     """Generic response model for all responses"""

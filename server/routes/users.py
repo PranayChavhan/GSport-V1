@@ -18,6 +18,8 @@ import httpx
 from typing import Dict
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
+from sqlalchemy import func, cast
+
 # from fastapi_pagination import LimitOffsetPage, Page
 # from fastapi_pagination.ext.sqlalchemy import paginate
 
@@ -29,7 +31,7 @@ import string
 
 # Replace these values with your actual Twilio Account SID, Auth Token, and Phone Number
 TWILIO_ACCOUNT_SID = "AC72b3ce65db8944f030eac41796c4b1b8"
-TWILIO_AUTH_TOKEN = "4d82ffe9acdada0e3fbeb267bdb5a4c0"
+TWILIO_AUTH_TOKEN = "9efa0a1a93ced4b4e1dcf96027c93dac"
 TWILIO_PHONE_NUMBER = "+19362255631"
 
 # In-memory storage for OTPs (replace with a proper database in production)
@@ -68,14 +70,38 @@ async def send_otp_route(phone: str):
 
     return {"message": "OTP sent successfully", "otp": otp}
 
+
 @userRouter.post('/verify_otp')
-async def verify_otp_route(phone: str, otp: str):
+async def verify_otp_route(phone_no: str, otp: str, db: Session=Depends(get_db)):
+    user = db.query(USERS.phone_no).all()
+    return user
     if verify_otp(phone, otp):
         # If OTP is valid, you might generate a JWT token for authentication
         # Here, I'm returning a simple message
         return {"message": "OTP verified successfully"}
     else:
         raise HTTPException(status_code=400, detail="Invalid OTP")
+
+
+# # login functionality with access token creation
+@userRouter.post('/login')
+async def user_login(phone_no:str, otp: str, db: Session=Depends(get_db)):
+    user = db.query(USERS).filter(USERS.phone_no == phone_no).first()
+    if verify_otp(phone_no, otp):
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No user found"
+            )
+        return {
+            'status': 'success',
+            'message': 'login successfully',
+            'data': user,
+            'access_token': create_access_token(user.id)
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Invalid OTP")
+
 
 
 @userRouter.get('/')
@@ -92,49 +118,72 @@ async def fetch_user_by_mail(orgMail, db: Session = Depends(get_db)):
         )
     return user
 
+
+
+
 # login functionality with access token creation
-@userRouter.post('/login')
-async def user_login(data: Login, db: Session=Depends(get_db)):
-    user = db.query(USERS).filter(USERS.email_id == data.email_id).first()
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password"
-        )
+# @userRouter.post('/login')
+# async def user_login(phone_no:int, db: Session=Depends(get_db)):
+#     user = db.query(USERS).filter(USERS.phone_no == phone_no).first()
+#     if user is None:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Incorrect email or password"
+#         )
+#     return {
+#         'status': 'success',
+#         'message': 'login successfully',
+#         'data': user,
+#         'access_token': create_access_token(user.id)
+#     }
 
-    hashed_pass = user.password
-    if not verify_password(data.password, hashed_pass):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password"
-        )
+
+
+
+
+
+
+
+
+# @userRouter.post('/login')
+# async def user_login(phone_no:str, otp: str, db: Session=Depends(get_db)):
+#     user = db.query(USERS).filter(func.concat('+91', USERS.phone_no) == phone_no).first()
+#     if verify_otp(phone_no, otp):
+#         if user is None:
+#             raise HTTPException(
+#                 status_code=status.HTTP_400_BAD_REQUEST,
+#                 detail="No user found"
+#             )
+#         return {
+#             'status': 'success',
+#             'message': 'login successfully',
+#             'data': user,
+#             'access_token': create_access_token(user.id)
+#         }
+#     else:
+#         raise HTTPException(status_code=400, detail="Invalid OTP")
     
-    return {
-        'status': 'success',
-        'message': 'login successfully',
-        'data': user,
-        'access_token': create_access_token(user.id)
-    }
-
 # adding new org to db
 @userRouter.post('/register')
-async def add_new_user(user: User, db: Session = Depends(get_db)):
-
-    #check if organizer with same email exists
+async def add_new_user(user: User, otp: str, db: Session = Depends(get_db)):
     user_check = db.query(USERS).filter(or_(USERS.email_id == user.email_id, USERS.phone_no==user.phone_no)).first()
     if user_check is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email or phone already exist"
+            detail="User with this email or phone already exist"    
         )
-
-    user.password = get_hashed_password(user.password)
-    
-    newUser = USERS( **dict(user))
-    newUser.id = shortuuid.uuid()[:10]
-    db.add(newUser)  
-    db.commit()
-    return GenericResponseModel(status='success', data=model_to_dict(newUser), message='User added successfully', status_code=http.HTTPStatus.CREATED)
+    if verify_otp(user.phone_no, otp):
+        newUser = USERS( **dict(user))
+        newUser.id = shortuuid.uuid()[:10]
+        db.add(newUser)  
+        db.commit()
+        return {
+            'status': 'success',
+            'message': 'login successfully',
+            'data': newUser,
+            'access_token': create_access_token(newUser.id)
+        }
+        return GenericResponseModel(status='success', access_token=create_access_token(newUser.id),  data=model_to_dict(newUser), message='User added successfully', status_code=http.HTTPStatus.CREATED)
 
 
 # update certain fields of the organizer

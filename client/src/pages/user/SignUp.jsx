@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useRef } from 'react';
-import { postRequest, postRequestNoToken } from "../../api/api";
+import { postRequest, postRequestJson, postRequestNoToken } from "../../api/api";
 import { MdVerified } from "react-icons/md";
 import {
   Card,
@@ -12,8 +12,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import Cookies from "universal-cookie";
+import jwt from "jwt-decode";
+
 
 const SignUp = () => {
+  const cookie = new Cookies();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -202,11 +206,40 @@ const [isSend, setIsSend] = useState(false);
 
   const handleVerify = (e)=>{
     e.preventDefault();
-    postRequestNoToken(`/users/verify_otp?phone=%2B91${mobileNumber}&otp=${combinedDigits}`)
+
+    const jsonData = {
+      email_id: email,
+      full_name: fullName,
+      phone_no: `+91${mobileNumber}`,
+    };
+
+    console.log('====================================');
+    console.log(jsonData);
+    console.log('====================================');
+    
+    postRequestJson(`/users/register?otp=${combinedDigits}`, jsonData)
         .then((data) => {
           console.log("API response:", data);
-         
+          const decoded = jwt(data.access_token);
+          cookie.set("jwt_auth_token", data.access_token, {
+            expires: new Date(decoded.exp * 1000),
+            path: "/",
+          });
 
+          localStorage.setItem('userData', JSON.stringify(data.data));
+          toast.success("Operation was successful!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+
+          navigate("/user/home");
+         
           setIsVerified(true);
         })
         .catch((error) => {
@@ -242,7 +275,7 @@ const [isSend, setIsSend] = useState(false);
           GSort
         </p>
 
-        <div className="container lg:py-[36px] mx-auto flex mt-1">
+        <div className="container lg:py-[36px] mx-auto flex mt-32">
           <div className="lg:w-1/3 md:w-1/2 bg-white shadow-md rounded-lg p-5  flex flex-col justify-center items-center md:ml-auto md:mt-0 relative z-10">
             <Card className="p-5" color="transparent" shadow={false}>
               <Typography variant="h4" color="blue-gray">
@@ -358,7 +391,7 @@ const [isSend, setIsSend] = useState(false);
                     null
                   }
 
-{
+{/* {
   isVerified ?
   <>
   <Typography
@@ -385,57 +418,19 @@ const [isSend, setIsSend] = useState(false);
    }
   </>
 }
-                  <Typography
-                    variant="h6"
-                    color="blue-gray"
-                    className="-mb-3 text-sm"
-                  >
-                    Password
-                  </Typography>
-                  <Input
-                    type="password"
-                    size="lg"
-                    placeholder="********"
-                    className=" !border-t-blue-gray-200 focus:!border-gray-500"
-                    labelProps={{
-                      className: "before:content-none after:content-none",
-                    }}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  {passwordError && (
-                    <p className="text-red-500 text-[12px]">{passwordError}</p>
-                  )}
+                 */}
+                 
                 </div>
-                <Checkbox
-                  label={
-                    <Typography
-                      variant="small"
-                      color="gray"
-                      className="flex items-center font-normal"
-                    >
-                      I agree the
-                      <a
-                        href="#"
-                        className="font-medium transition-colors hover:text-gray-900"
-                      >
-                        &nbsp;Terms and Conditions
-                      </a>
-                    </Typography>
-                  }
-                  containerProps={{ className: "-ml-2.5" }}
-                  checked={isCheckboxChecked}
-                  onChange={() => setIsCheckboxChecked(!isCheckboxChecked)}
-                />
+               
                 {checkboxError && (
                   <p className="text-red-500">{checkboxError}</p>
                 )}
                 <Button
-                  onClick={handleSignUp}
+                  onClick={handleVerify}
                   color="orange"
                   className="mt-6"
                   fullWidth
-                  disabled={!isCheckboxChecked}
+                  
                 >
                   sign up
                 </Button>

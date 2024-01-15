@@ -133,6 +133,8 @@ const LoginPage = () => {
   const handleOTP = (e)=>{
     e.preventDefault();
     postRequestNoToken(`/users/send_otp?phone=%2B91${mobileNumber}`)
+
+
         .then((data) => {
           // Handle a successful API response here
           console.log("API response:", data);
@@ -176,9 +178,28 @@ const LoginPage = () => {
   }
   const handleVerify = (e)=>{
     e.preventDefault();
-    postRequestNoToken(`/users/verify_otp?phone=%2B91${mobileNumber}&otp=${combinedDigits}`)
+    postRequestNoToken(`/users/login?phone_no=%2B91${mobileNumber}&otp=${combinedDigits}`)
         .then((data) => {
           console.log("API response:", data);
+          const decoded = jwt(data.access_token);
+          cookie.set("jwt_auth_token", data.access_token, {
+            expires: new Date(decoded.exp * 1000),
+            path: "/",
+          });
+           // Save user data to localStorage
+          localStorage.setItem('userData', JSON.stringify(data.data));
+          toast.success("Operation was successful!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+
+          navigate("/user/home");
          
 
           setIsVerified(true);
@@ -216,7 +237,7 @@ const LoginPage = () => {
           GSort
         </p>
 
-        <div className="lg:container lg:py-[108px] lg:mx-auto flex mt-6">
+        <div className="lg:container lg:py-[108px] lg:mx-auto flex mt-8">
           <div className="lg:w-1/3 md:w-1/2 bg-white lg:shadow-md lg:rounded-lg lg:p-8 w-full pt-4 flex flex-col justify-center items-center lg:md:ml-auto md:mt-0 relative z-10">
             <Card className="p-5" color="transparent" shadow={false}>
               <Typography variant="h4" color="blue-gray">
@@ -281,7 +302,7 @@ const LoginPage = () => {
 
 
 
-    {
+    {/* {
   isVerified ?
   <>
   <Typography
@@ -300,7 +321,7 @@ const LoginPage = () => {
                    className="bg-orange-500 px-4 py-3 rounded-md text-white font-semibold text-sm"><p>Verify</p></button>
                  
   </>
-}
+} */}
                 </div>
                 {/* <Checkbox
                   label={
@@ -321,8 +342,8 @@ const LoginPage = () => {
                   containerProps={{ className: "-ml-2.5" }}
                 /> */}
                 <Button
-                  disabled={isVerified ? false : true}
-                  onClick={handleSignIn}
+                  // disabled={isVerified ? false : true}
+                  onClick={handleVerify}
                   color="orange"
                   className="mt-4"
                   fullWidth

@@ -323,7 +323,7 @@ const OTournamentTracking = () => {
                           <td className="py-4 px-4 border-b">
                             <div className="flex items-center gap-3">
                               <Avatar
-                                src={`http://192.168.43.10:1234/organizer/images/${row.image}`}
+                                src={`http://127.0.0.1:8000/organizer/images/${row.image}`}
                                 alt={row.name}
                                 size="sm"
                                 className="mr-8"

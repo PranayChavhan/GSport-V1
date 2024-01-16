@@ -255,7 +255,7 @@ const TournamentDetail = () => {
               <img
                 alt="content"
                 className="object-cover object-center h-full w-full"
-                src={`http://192.168.43.10:1234/organizer/images/${org.image}`}
+                src={`http://127.0.0.1:8000/organizer/images/${org.image}`}
               />
             </div>
             <div className="flex flex-col sm:flex-row">

@@ -45,6 +45,10 @@ async def get_tournament_by_id(tournament_id: str, db: Session=Depends(get_db)):
 async def get_tournament_by_userid(user_id: str, db: Session=Depends(get_db)):
     return TournamentService(db).get_tournament_by_userid(user_id)
 
+@tournamentRouter.get('/games/{tournament_game_id}')
+async def get_tournament_games_by_id(tournament_game_id: str, db: Session = Depends(get_db)):
+    return TournamentService(db).get_tournament_games_by_id(tournament_game_id)
+
 
 @tournamentRouter.get('/{tournament_id}/games')
 async def get_tournament_games(

@@ -109,8 +109,7 @@ class TOURNAMENT_GAMES(Base):
     info = Column(String(100), default=None)
     tournament_id = Column(String(30), ForeignKey('TOURNAMENT.id',ondelete="CASCADE"), nullable=False)
     tournament = relationship("TOURNAMENT")
-    game_id = Column(Integer, ForeignKey('GAMES.id'), nullable=False)
-    game = relationship("GAMES")
+   
     participation_fees = Column(Integer, default=0, nullable=False)
     prize_pool = Column(Integer, default=0,  nullable=False)
     max_teams = Column(Integer, default=8,  nullable=False)

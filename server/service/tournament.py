@@ -138,6 +138,13 @@ class TournamentService():
             return GenericResponseModel(status='error', message='Tournament not found or invalid data', status_code=http.HTTPStatus.BAD_REQUEST)
         return {'status': 'success', 'data': tournament, 'message': 'Tournament details found', 'status_code':http.HTTPStatus.ACCEPTED}
 
+    def get_tournament_games_by_id(self, tournament_game_id: str):
+        games = self.db.query(TOURNAMENT_GAMES).filter(TOURNAMENT_GAMES.id==tournament_game_id).first()
+        
+        return games
+        # return GenericResponseModel(status='success', message='Games', data=games, status_code=http.HTTPStatus.ACCEPTED)
+    
+
 
     def get_tournament_games(self, tournament_id: str):
         games = self.db.query(TOURNAMENT_GAMES).filter(TOURNAMENT_GAMES.tournament_id==tournament_id).all()
@@ -150,6 +157,8 @@ class TournamentService():
         game_obj.id = shortuuid.uuid()[:16]
         self.db.add(game_obj)
         return GenericResponseModel(status='success', message='tournament created successfully', data={'game_id': game_obj.id}, status_code=http.HTTPStatus.CREATED)
+
+
 
     def add_comment(self, comment: Commentry, tournament_id: str, user_id: str):
         comment_obj = COMMENTRY(**comment.dict())

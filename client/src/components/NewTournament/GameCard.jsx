@@ -1,92 +1,76 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from "react";
+/* eslint-disable react/jsx-no-undef */
+import React, { useState, useEffect } from "react";
 import {
-  Input,
   Button,
+  Card,
+  CardBody,
+  CardFooter,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  Input,
   Textarea,
-  Spinner,
+  Typography,
+  List,
+  ListItem,
+  ListItemPrefix,
+  Radio,
   Select as MSelect,
   Option,
 } from "@material-tailwind/react";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+
+import EditIcon from "@mui/icons-material/Edit";
+import { FaFemale, FaMale } from "react-icons/fa";
+
+import { ImCross } from "react-icons/im";
+import { useDispatch } from "react-redux";
+
 import DatePicker from "react-datepicker";
+
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-    postRequest,
-  } from "../../api/api";
-  
 
-  function Success() {
-    return (
-      <div>
-        <div className="flex flex-col justify-center items-center gap-3">
-          <p className="text-6xl">
-            <CheckCircleOutlineIcon
-              fontSize="inherit"
-              className="text-green-400"
-            />
-          </p>
-          <p className="font-poppins text-xl">Game added Succesfully</p>
-          <p className="font-poppins text-sm text-gray-600">
-            Now you can procced to the payment
-          </p>
-        </div>
-      </div>
-    );
-  }
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { getRequest, postRequest } from "../../api/api";
 
+function UpdateDialog() {
+  const [open, setOpen] = useState(false);
 
-const AddGame = () => {
+  const handleOpen = () => setOpen(!open);
+
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [qualification, setQualification] = useState("Single Elimination");
+  const [game, setGame] = useState(null);
   const [whoCanParticipate, setWhoCanParticipate] = useState(2);
-  let { id } = useParams();
-  const navigate = useNavigate()
-  const [ isSuccess, setIsSuccess] = useState(false);
-  const [isAddingGame, setIsAddingGame] = useState(false);
-  const [token, setToken] = useState("");
+
   const initialValues = {
-    name: null,
-    tournament_id: id.toString(),
-    info: null, 
+    name: null, // string
+    tournament_id: null, //string
+    game_id: null, // hardcoded from database 1 -> cricket
+    info: null, // string
     prize_pool: null,
     participation_fees: null,
     team_size: null,
     max_teams: null,
     total_rounds: null,
-    min_boys: 0,
-    min_girls: 0,
+    min_boys: null,
+    min_girls: null,
     open_to: whoCanParticipate,
     min_age: null,
     max_age: null,
-    type: qualification,
+
+    // field to be added
+
+    type: qualification, // select field
     num_groups: 0,
     teams_per_group: 0,
     avg_duration: 45,
-    start_date: startDate,
-    end_date: endDate,
-  };
 
-  useEffect(() => {
-    const getCookie = (name) => {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + '=')) {
-          return cookie.substring(name.length + 1);
-        }
-      }
-      return null;
-    };
-    const jwtToken = getCookie('jwt_auth_token');
-    if (jwtToken) {
-      setToken(jwtToken);
-    } else {
-      console.log('JWT Token not found in cookies');
-    }
-  }, []);
+    start_date: startDate, // string
+    end_date: endDate, //string
+  };
 
   const [values, setValues] = useState(initialValues);
 
@@ -127,20 +111,6 @@ const AddGame = () => {
     });
   };
 
-  const gameOptions = [
-    {
-      value: 1,
-      label: "Cricket",
-    },
-    {
-      value: 2,
-      label: "Football",
-    },
-    {
-      value: 3,
-      label: "Badminton",
-    }
-  ];
   const handleGameChange = (selectedId) => {
     setValues({
       ...values,
@@ -179,57 +149,45 @@ const AddGame = () => {
     }
   };
 
-  
-  const addGameToDB = () =>{
-    setIsAddingGame(true);
-    if (values) {
-      postRequest(`organizer/tournament/${id}/games`, values, token)
-        .then((data) => {
-          console.log('====================================');
-          console.log(data);
-          console.log('====================================');
-          toast.success("Operation was successful!", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-          setIsSuccess(true);
-        //   navigate("/user/home");
-        })
-        .catch((error) => {
-          if (error.response && error.response.status === 400) {
-            console.error("API error: Invalid Creedentials");
-            toast.error("Error", {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-            });
-          } else {
-            console.error("API error:", error);
-          }
-        });
-    }
-  }
+  const addGameToDB = async () => {
+    setValues({
+      ...values,
+      start_date: new Date(startDate).toISOString(),
+      end_date: new Date(endDate).toISOString(),
+    });
+  };
 
+  const successGames = true;
   return (
-    <div  className="w-full gap-8 py-5 border-t-2 ">
-      {isSuccess ? (
-         <>
-         <Success />
-         
-         </>
-      ) : (
-        <div className="space-y-4 shadow-sm md:p-4 w-full ">
+    <div>
+      <Button
+        color="amber"
+        variant="outlined"
+        onClick={handleOpen}
+        className="hover:text-white hover:bg-orange-500 flex gap-2 items-center border-none"
+      >
+        <EditIcon />
+        <p>Edit</p>
+      </Button>
+      <Dialog
+        size="xl"
+        open={open}
+        handler={handleOpen}
+        className="lg:scroll-smooth shadow-none"
+      >
+        <DialogHeader className="flex justify-between">
+          <p className=" text-xl text-center font-poppins font-bold">
+            Add new Game
+          </p>
+          <p
+            onClick={handleOpen}
+            className="w-8 h-8 rounded-lg bg-red-400 p-2 text-white hover:bg-red-600 cursor-pointer"
+          >
+            <ImCross className="w-4 h-4" />
+          </p>
+        </DialogHeader>
+        <DialogBody divider className="h-[40rem] overflow-scroll">
+          {/* GAme details div starts */}
           <div className="w-full lg:p-4 border border-black-100 rounded-lg flex flex-col gap-6">
             <p className="font-semibold font-poppins text-blue-gray-700">
               Enter game details{" "}
@@ -251,12 +209,8 @@ const AddGame = () => {
                   color="orange"
                   label="select game to be played"
                 >
-                  {gameOptions ? (
-                    gameOptions.map((o, index) => (
-                      <Option key={index} className="capitalize" value={o.value}>
-                        {o.label}
-                      </Option>
-                    ))
+                  {successGames ? (
+                    <Option className="capitalize">1</Option>
                   ) : (
                     <Option>game 1</Option>
                   )}
@@ -342,6 +296,9 @@ const AddGame = () => {
               name="info"
             />
           </div>
+          {/* GAme details div ends */}
+
+          {/* Participants div starts */}
           <div className="lg:p-4 border border-black-100 rounded-lg space-y-4">
             <div className="flex gap-4">
               <p className="font-semibold font-poppins text-blue-gray-700">
@@ -349,6 +306,7 @@ const AddGame = () => {
               </p>
             </div>
             <div className="w-1/3 flex flex-col lg:flex-row gap-5">
+              {/* <GenderRadioButtons key={gameIndex} gameIndex={gameIndex}/> */}
               <MSelect
                 onChange={handleParticipantRadio}
                 color="orange"
@@ -403,6 +361,9 @@ const AddGame = () => {
               />
             </div>
           </div>
+          {/* Participants div ends */}
+
+          {/* Prize and schedule div starts */}
           <div className="w-full lg:p-4  border border-black-100 flex md:justify-between flex-col lg:flex-row gap-4">
             <div className="w-full flex flex-col gap-4 ">
               <p className="font-semibold font-poppins text-blue-gray-700">
@@ -427,6 +388,8 @@ const AddGame = () => {
                 />
               </div>
             </div>
+
+            {/* Schedule div starts */}
             <div className="w-full flex flex-col gap-4">
               <p className="font-semibold font-poppins text-blue-gray-700">
                 Schedule{" "}
@@ -437,9 +400,8 @@ const AddGame = () => {
                   selected={startDate}
                   showTimeSelect
                   onChange={(date) => {
-                    setStartDate(date)
-                    values.start_date = new Date(date).toISOString()
-
+                    setStartDate(date);
+                    values.start_date = new Date(date).toISOString();
                   }}
                   className="w-64 sm:w-56 md:w-60 lg:w-48 xl:w-60 border border-gray-500 p-4 py-2 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 text-sm md:text-normal"
                   placeholderText="Select start Date"
@@ -455,7 +417,7 @@ const AddGame = () => {
                   showTimeSelect
                   onChange={(date) => {
                     setEndDate(date);
-                    values.end_date = new Date(date).toISOString()
+                    values.end_date = new Date(date).toISOString();
                   }}
                   className="w-64 sm:w-56 md:w-60 lg:w-48 xl:w-60 border border-gray-500 p-4 py-2 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200  text-sm md:text-normal"
                   placeholderText="Select End Date"
@@ -468,20 +430,129 @@ const AddGame = () => {
                 />
               </div>
             </div>
+            {/* Schedule div ends */}
           </div>
+          {/* Prize and schedule div ends */}
+
           <div className="w-full flex justify-center items-center">
             <Button
               onClick={addGameToDB}
               className="flex justify-center items-center"
               color="orange"
             >
-              {isAddingGame ? <Spinner color="amber" /> : "Add game"}
+              {/* {isAddingGame ? <Spinner color="amber" /> : "Add game"} */}
+              Add Game
             </Button>
           </div>
-        </div>
-      )}
+        </DialogBody>
+      </Dialog>
     </div>
+  );
+}
+
+const GameCard = () => {
+  let { id } = useParams();
+
+  const [gid, setGid] = useState('');
+
+  const [org, setOrg] = useState([]);
+  useEffect(() => {
+    const fetchTournamentData = async () => {
+      try {
+        const url = `/tournaments/${id}/games`;
+        const data = await getRequest(url);
+
+        // Update state only if data is available
+        if (data && data.data) {
+          setOrg(data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching tournament data:", error);
+      }
+    };
+
+    fetchTournamentData();
+  }, [id]);
+
+  console.log("====================================");
+  console.log(org);
+  console.log("====================================");
+  return (
+
+    
+    <div className="flex flex-row gap-4">
+       {org.map((item) => (
+          <Card key={item.id} className=" border font-poppins">
+             <Link
+             to={`game/${item.id}`}
+             >
+             
+          <CardBody className="flex flex-col gap-4">
+    
+            <div className="flex flex-col lg:flex-row justify-between gap-2">
+              <div className="flex flex-col ">
+                <Typography
+                  variant="h5"
+                  className="font-poppins capitalize flex gap-4 justify-start items-center"
+                >
+                  
+                  <p>{item.name}</p>
+                  <p className="text-sm font-normal text-orange-500 bg-orange-50 p-1 px-2 rounded-lg">
+                    Cricket
+                  </p>
+                </Typography>
+                <Typography variant="h6" className="font-poppins">
+                  <p>Single Elimination</p>
+                </Typography>
+              </div>
+    
+              <p className="border-2 border-yellow-500 w-fit h-fit rounded-lg p-1 px-2 bg-gray-100 border-dashed">
+                Prize Pool
+              </p>
+            </div>
+    
+            <div className="flex flex-col gap-3">
+              <div className="font-poppins text-sm text-justify  py-2">
+                The place is close to Barceloneta Beach and bus stop just 2 min by
+                walk and near to &quot;Naviglio&quot; where you can enjoy the main
+                night life in Barcelona. The place is close to Barceloneta Beach and
+                bus stop just 2 min by walk and near to &quot;Naviglio&quot; where
+                you can enjoy the main night life in Barcelona.
+              </div>
+              <div className="flex justify-between">
+                <p className="bg-gray-100 p-1 px-2 rounded-lg">Only boys</p>
+                <div className="flex gap-2">
+                  <p className="bg-pink-50 text-pink-500 flex flex-row items-center p-1 px-2 rounded-lg">
+                    <FaFemale />
+                    <p>4</p>
+                  </p>
+                  <p className="bg-blue-50 text-blue-500 flex flex-row items-center p-1 px-2 rounded-lg">
+                    <FaMale />
+                    <p>5</p>
+                  </p>
+                </div>
+              </div>
+              <Typography className="flex flex-col sm:flex-row justify-between gap-4 font-poppins">
+                <div className="flex gap-4 text-xs lg:text-sm items-center">
+                  <p className="p-1 px-2 h-fit bg-green-50  text-green-500 rounded-lg">
+                    Start Date
+                  </p>
+                  <p className="p-1 px-2 h-fit bg-red-50  text-red-500 rounded-lg">
+                    End Date
+                  </p>
+                </div>
+    
+                <UpdateDialog />
+              </Typography>
+            </div>
+          </CardBody>
+          </Link>
+        </Card>
+    
+        ))}
+        </div>
+       
   );
 };
 
-export default AddGame;
+export default GameCard;

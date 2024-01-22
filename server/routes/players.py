@@ -102,13 +102,13 @@ async def get_team_by_id(team_id: str, user_id: str=Depends(get_current_user), d
     return {'status': 'success', 'message': 'Team details', 'status_code': http.HTTPStatus.OK, 'data': team}
 
 
-@playersRouter.get('/team/tournament_id/{tournament_id}')
-async def get_team_by_id(tournament_id: str, user_id: str=Depends(get_current_user), db: Session = Depends(get_db)):
+@playersRouter.get('/team/tournament_id/{tournament_game_id}')
+async def get_team_by_id(tournament_game_id: str, db: Session = Depends(get_db)):
     team = db.query(TEAMS).options(
         load_only(TEAMS.name, TEAMS.admin_id, TEAMS.tournament_game_id, TEAMS.image, TEAMS.matches, TEAMS.win, TEAMS.loose, TEAMS.points, TEAMS.createdAt, TEAMS.score),
         joinedload(TEAMS.admin).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender, USERS.college),
         joinedload(TEAMS.team_players).load_only(TEAM_PLAYERS.id).joinedload(TEAM_PLAYERS.player).load_only(USERS.full_name, USERS.email_id, USERS.profile_url, USERS.dob, USERS.gender),
-    ).filter(TEAMS.tournament_id == tournament_id).all()
+    ).filter(TEAMS.tournament_game_id == tournament_game_id).all()
     if team is None:
         return GenericResponseModel(status='error', message='Invalid team id passed', status_code=http.HTTPStatus.BAD_REQUEST)
 

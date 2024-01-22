@@ -10,6 +10,7 @@ import PlayerDetails from "../components/Registration/PlayerDetails"
 import ErrorPage from "../error-page"
 import Organizers from "../layout/Organizers"
 import Earnings from "../pages/organizer/Earnings"
+import GameDetails from "../pages/organizer/GameDetails"
 import NewTournament from "../pages/organizer/NewTournament"
 import OCalendar from "../pages/organizer/OCalendar"
 import ODashboard from "../pages/organizer/ODashboard"
@@ -67,6 +68,10 @@ export const OrganizerRoutes = {
         { 
           path: "tournament-details/:id",
           element: <TournamentDetail/>
+        },
+        { 
+          path: "tournament-details/:id/game/:id",
+          element: <GameDetails/>
         },
         { 
             path: "tournament-tracking",

@@ -74,8 +74,8 @@ async def send_otp_route(phone: str):
 @userRouter.post('/verify_otp')
 async def verify_otp_route(phone_no: str, otp: str, db: Session=Depends(get_db)):
     user = db.query(USERS.phone_no).all()
-    return user
-    if verify_otp(phone, otp):
+
+    if verify_otp(phone_no, otp):
         # If OTP is valid, you might generate a JWT token for authentication
         # Here, I'm returning a simple message
         return {"message": "OTP verified successfully"}

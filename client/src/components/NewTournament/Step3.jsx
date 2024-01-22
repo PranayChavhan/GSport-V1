@@ -6,6 +6,7 @@ import { Button } from "@material-tailwind/react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import CustomizedSteppers from "../../components/Stepper";
 import AddGame from "./AddGame";
+import GameCard from "./GameCard";
 const Step3 = () => {
   // const dispatch = useDispatch();
 
@@ -37,15 +38,13 @@ const Step3 = () => {
           </Link>
       </div>
 
+      <div className="flex flex-row">
+      <GameCard/>
+      </div>
       <div className="flex justify-center ">
-      {/* <Button color="red" onClick={handleRemoveGame} className=" bg-gray-400 shadow-none hover:bg-red-400 text-white px-4 py-2 mr-2">
-        Remove Game
-      </Button>
-        <Button color="amber" onClick={handleAddGame} className="bg-orange-500 text-white px-4 py-2 ">
-          Add Game
-        </Button> */}
 
-        <AddGame/>
+
+        {/* <AddGame/> */}
       </div>
 
       <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4 ">

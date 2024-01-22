@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 const TABLE_HEAD = ["Team", "Matches", "Win", "Loose", "Points"];
 const TABLE_HEAD2 = ["Player", "College", "Email", "Team", "Action"];
 
-
 const TournamentDetail = () => {
   const [org, setOrg] = useState([]);
   const [commentry, setCommentry] = useState([]);
@@ -254,7 +253,7 @@ const TournamentDetail = () => {
               <img
                 alt="content"
                 className="object-cover object-center h-full w-full"
-                src={`http://192.168.43.10:1234/organizer/images/${org.image}`}
+                src={`http://127.0.0.1:8000/organizer/images/${org.image}`}
               />
             </div>
             <div className="flex flex-col sm:flex-row">
@@ -265,24 +264,21 @@ const TournamentDetail = () => {
                   </h2>
                   <div className="w-12 h-1 bg-yellow-500 rounded mt-2 mb-4"></div>
 
-<div className="flex flex-row items-center justify-between">
+                  <div className="flex flex-row items-center justify-between">
+                    <div className="flex flex-col items-start text-sm md:text-md">
+                      <p className="mb-1">
+                        Starts on : {new Date(org.start_date).getDate()}/
+                        {new Date(org.start_date).getMonth()}/
+                        {new Date(org.start_date).getFullYear()}
+                      </p>
+                      <p className="mb-1">Badminton</p>
+                    </div>
 
-  <div className="flex flex-col items-start text-sm md:text-md">
-  <p className="mb-1">
-                    Starts on : {new Date(org.start_date).getDate()}/
-                    {new Date(org.start_date).getMonth()}/
-                    {new Date(org.start_date).getFullYear()}
-                  </p>
-                  <p className="mb-1">Badminton</p>
-  </div>
-
-<div className="flex flex-col items-start md:text-md text-sm">
-<p className="mb-1">Prize : 20000</p>
-                  <p className="mb-1">Total teams : 8</p>
-</div>
-
-</div>
-                 
+                    <div className="flex flex-col items-start md:text-md text-sm">
+                      <p className="mb-1">Prize : 20000</p>
+                      <p className="mb-1">Total teams : 8</p>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="sm:w-2/3 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 md:text-center sm:text-left">
@@ -301,7 +297,6 @@ const TournamentDetail = () => {
             <>
               {
                 <div className="col-start-1 col-end-5 ">
-                    
                   {matchSchedule.map((item, index) => (
                     <div key={index} className="">
                       <div className=" p-4 bg-white shadow-lg rounded-lg rounded-b-[55px] mb-10 w-[22.5rem] md:w-full">
@@ -321,8 +316,12 @@ const TournamentDetail = () => {
                             </div>
 
                             <div className=" flex flex-col items-start">
-                              <h2 className="md:text-lg text-[12px]">{item.team1.name}</h2>
-                              <p className="md:text-md text-[10px] font-semibold">{item.team1.admin.college}</p>
+                              <h2 className="md:text-lg text-[12px]">
+                                {item.team1.name}
+                              </h2>
+                              <p className="md:text-md text-[10px] font-semibold">
+                                {item.team1.admin.college}
+                              </p>
                             </div>
                             <div className="mb-2 md:ml-10">
                               <div className="flex flex-row items-center  md:gap-4">
@@ -367,8 +366,12 @@ const TournamentDetail = () => {
                             </div>
 
                             <div className=" flex flex-col items-start">
-                              <h2 className="md:text-lg text-[12px]">{item.team2.name}</h2>
-                              <p className="md:text-md text-[10px] font-semibold">{item.team2.admin.college}</p>
+                              <h2 className="md:text-lg text-[12px]">
+                                {item.team2.name}
+                              </h2>
+                              <p className="md:text-md text-[10px] font-semibold">
+                                {item.team2.admin.college}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -417,7 +420,7 @@ const TournamentDetail = () => {
                           if (commentVisible == false) {
                             setCommentVisible(true);
                             setSquadVisible(false);
-                            setPointsTable(false)
+                            setPointsTable(false);
                           } else setCommentVisible(true);
                         }}
                       >
@@ -426,12 +429,14 @@ const TournamentDetail = () => {
 
                       <button
                         className={`${
-                          squadVisible ? "bg-orange-400 md:p-3 p-2 rounded-xl text-white " : "p-3"
+                          squadVisible
+                            ? "bg-orange-400 md:p-3 p-2 rounded-xl text-white "
+                            : "p-3"
                         } `}
                         onClick={() => {
                           if (squadVisible == false) {
                             setCommentVisible(false);
-                            setPointsTable(false)
+                            setPointsTable(false);
                             setSquadVisible(true);
                           } else setSquadVisible(true);
                         }}
@@ -441,7 +446,9 @@ const TournamentDetail = () => {
 
                       <button
                         className={` md:hidden ${
-                          pointsTable ? "bg-orange-400 md:p-3 p-2 rounded-xl text-white " : "p-3"
+                          pointsTable
+                            ? "bg-orange-400 md:p-3 p-2 rounded-xl text-white "
+                            : "p-3"
                         } `}
                         onClick={() => {
                           if (pointsTable == false) {
@@ -458,129 +465,106 @@ const TournamentDetail = () => {
                     {commentVisible ? (
                       <>
                         {commentry.map((item, index) => (
-                      <div key={index}>
-                       {
-                        item.comment ?
+                          <div key={index}>
+                            {item.comment ? (
+                              <>
+                                <div className="bg-gray-50 my-2 text-gray-800  p-4 rounded-2xl text-[14px] flex flex-row justify-between items-center">
+                                  <p>{item.comment}</p>
 
-                        <>
-                         <div className="bg-gray-50 my-2 text-gray-800  p-4 rounded-2xl text-[14px] flex flex-row justify-between items-center">
-                          <p>{item.comment}</p>
-
-                          <p className="text-xs text-gray-600">
-                            {new Date(item.createdAt).toLocaleString("en-US", {
-                              hour: "numeric",
-                              minute: "numeric",
-                              second: "numeric",
-                              hour12: true,
-                            })}
-                          </p>
-                        </div>
-                        </>
-                        :
-                        null
-                       }
-                      </div>
-                    ))}
+                                  <p className="text-xs text-gray-600">
+                                    {new Date(item.createdAt).toLocaleString(
+                                      "en-US",
+                                      {
+                                        hour: "numeric",
+                                        minute: "numeric",
+                                        second: "numeric",
+                                        hour12: true,
+                                      }
+                                    )}
+                                  </p>
+                                </div>
+                              </>
+                            ) : null}
+                          </div>
+                        ))}
                       </>
                     ) : null}
                     {squadVisible ? (
                       <>
                         <div className=" w-full overflow-hidden">
-                          
-                              {tData.map(
-                                (
-                                  {team_players, name  },
-                                  index
-                                ) => (
-                                  <div key={index}>
+                          {tData.map(({ team_players, name }, index) => (
+                            <div key={index}>
+                              {team_players.map((items, index) => (
+                                <tr
+                                  key={index}
+                                  className="bg-white rounded-md shadow-sm flex items-center justify-evenly mb-4"
+                                >
+                                  <td className="p-4">
+                                    <div className="rounded-full h-10 overflow-hidden">
+                                      <img
+                                        alt="content"
+                                        className="object-cover object-center h-full w-full"
+                                        src={items.player.profile_url}
+                                      />
+                                    </div>
+                                  </td>
+                                  <td className="p-4">
+                                    <Typography
+                                      variant="small"
+                                      color="blue-gray"
+                                      className="font-normal"
+                                    >
+                                      {items.player.full_name}
+                                    </Typography>
+                                  </td>
+                                  <td className="p-4">
+                                    <Typography
+                                      variant="small"
+                                      color="blue-gray"
+                                      className="font-normal"
+                                    >
+                                      {items.player.college}
+                                    </Typography>
+                                  </td>
+                                  <td className="p-4">
+                                    <Typography
+                                      as="a"
+                                      href="#"
+                                      variant="small"
+                                      color="blue-gray"
+                                      className="font-medium"
+                                    >
+                                      {items.player.email_id}
+                                    </Typography>
+                                  </td>
+                                  <td className="p-4">
+                                    <Typography
+                                      as="a"
+                                      href="#"
+                                      variant="small"
+                                      color="blue-gray"
+                                      className="font-medium"
+                                    >
+                                      {name}
+                                    </Typography>
+                                  </td>
 
-                                    
-
-{
-                        team_players.map((items, index)=>(
-
-                          <tr
-                                  key={index}  
-                          className="bg-white rounded-md shadow-sm flex items-center justify-evenly mb-4"
-                        >
-
-                          <td className="p-4">
-
-                          <div className="rounded-full h-10 overflow-hidden">
-              <img
-                alt="content"
-                className="object-cover object-center h-full w-full"
-                src={items.player.profile_url}
-              />
-            </div>
-                            
-                          </td>
-                          <td className="p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-normal"
-                            >
-                              {items.player.full_name}
-                            </Typography>
-                          </td>
-                          <td className="p-4">
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-normal"
-                            >
-                              {items.player.college}
-                            </Typography>
-                          </td>
-                          <td className="p-4">
-                            <Typography
-                              as="a"
-                              href="#"
-                              variant="small"
-                              color="blue-gray"
-                              className="font-medium"
-                            >
-                              {items.player.email_id}
-                            </Typography>
-                          </td>
-                          <td className="p-4">
-                            <Typography
-                              as="a"
-                              href="#"
-                              variant="small"
-                              color="blue-gray"
-                              className="font-medium"
-                            >
-                              {name}
-                            </Typography>
-                          </td>
-
-                          {/* <td className="p-4">
+                                  {/* <td className="p-4">
                            <button className="bg-orange-400 px-4 py-2 rounded-lg text-white text-sm hover:bg-orange-600">
                             Refund
                            </button>
                           </td> */}
-                        </tr>
-                        ))
-                      }
-
-
-                                 
-                                  </div>
-                                )
-                              )}
-                           
+                                </tr>
+                              ))}
+                            </div>
+                          ))}
                         </div>
                       </>
                     ) : null}
 
-
-                    {
-                      pointsTable?
+                    {pointsTable ? (
                       <>
-                      
-                      <Card className=" w-full overflow-hidden">
+                        <Card className=" w-full overflow-hidden">
                           <table className="w-full min-w-max table-auto text-left">
                             <thead>
                               <tr>
@@ -664,10 +648,9 @@ const TournamentDetail = () => {
                               )}
                             </tbody>
                           </table>
-                        </Card></>
-
-                        :null
-                    }
+                        </Card>
+                      </>
+                    ) : null}
                   </div>
                 </div>
               }
@@ -724,64 +707,64 @@ const TournamentDetail = () => {
                   </tr>
                 </thead>
                 <tbody>
-                 
-                  {tData.map(({ name, matches, win, loose, points, team_players }, index) => (
-                    
-                    <tr key={name} className="even:bg-blue-gray-50/50">
-                      
-
-                     
-                      <td className="p-4">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {name}
-                        </Typography>
-                      </td>
-                      <td className="p-4">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {matches}
-                        </Typography>
-                      </td>
-                      <td className="p-4">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {win}
-                        </Typography>
-                      </td>
-                      <td className="p-4">
-                        <Typography
-                          as="a"
-                          href="#"
-                          variant="small"
-                          color="blue-gray"
-                          className="font-medium"
-                        >
-                          {loose}
-                        </Typography>
-                      </td>
-                      <td className="p-4">
-                        <Typography
-                          as="a"
-                          href="#"
-                          variant="small"
-                          color="blue-gray"
-                          className="font-medium"
-                        >
-                          {points}
-                        </Typography>
-                      </td>
-                    </tr>
-                  ))}
+                  {tData.map(
+                    (
+                      { name, matches, win, loose, points, team_players },
+                      index
+                    ) => (
+                      <tr key={name} className="even:bg-blue-gray-50/50">
+                        <td className="p-4">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                          >
+                            {name}
+                          </Typography>
+                        </td>
+                        <td className="p-4">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                          >
+                            {matches}
+                          </Typography>
+                        </td>
+                        <td className="p-4">
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                          >
+                            {win}
+                          </Typography>
+                        </td>
+                        <td className="p-4">
+                          <Typography
+                            as="a"
+                            href="#"
+                            variant="small"
+                            color="blue-gray"
+                            className="font-medium"
+                          >
+                            {loose}
+                          </Typography>
+                        </td>
+                        <td className="p-4">
+                          <Typography
+                            as="a"
+                            href="#"
+                            variant="small"
+                            color="blue-gray"
+                            className="font-medium"
+                          >
+                            {points}
+                          </Typography>
+                        </td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </Card>

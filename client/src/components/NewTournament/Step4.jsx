@@ -1,202 +1,210 @@
 /* eslint-disable no-unused-vars */
-// import React from 'react'
+import React, { useState } from 'react';
+import 'react-datepicker/dist/react-datepicker.css';
+import QRCode from 'qrcode.react';
+import { 
+  Input, 
+  Button, 
+  Switch, 
+  IconButton
+} from '@material-tailwind/react';
+import Select from "react-select";
 
-import React, {useState, useEffect} from "react";
-import {
-  Button,
-} from "@material-tailwind/react";
-import CustomizedSteppers from "../../components/Stepper";
+import check from "../../assets/icons/check.png"
+import copy from "../../assets/icons/copy.png"
+import CustomizedSteppers from '../Stepper';
 import { useNavigate, useParams } from 'react-router-dom';
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { toast } from "react-toastify";
-import {
-  patchRequest,
-} from "../../api/api";
-
-
-
-
-
-
-
 const Step4 = () => {
-        
-    const [confirmPayment, setConfirmPayment] = useState(false);
-    const [paymentId, setPaymentId] = useState("");
-    const [token, setToken] = useState("");
-    const navigate = useNavigate();
-    let { id } = useParams();
 
-    useEffect(() => {
-      const getCookie = (name) => {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          if (cookie.startsWith(name + '=')) {
-            return cookie.substring(name.length + 1);
-          }
-        }
-        return null;
-      };
-      const jwtToken = getCookie('jwt_auth_token');
-      if (jwtToken) {
-        setToken(jwtToken);
-      } else {
-        console.log('JWT Token not found in cookies');
-      }
-    }, []);
-    
-    const launchRazorPay = () => {
-      let options = {
-        key: "rzp_test_UR1RXcKK4NZyYp",
-        amount: 100*100,
-        currency: "INR",
-        name: "G Sort",
-        description: "Movie purchase or rental",
-        image:
-          "https://i.ibb.co/zPBYW3H/imgbin-bookmyshow-office-android-ticket-png.png",
-          handler: response => {
-            const payId = response.razorpay_payment_id;
-            setPaymentId(payId);
-            setConfirmPayment(true);
-            if (payId) {
-              patchRequest(`organizer/tournament/${id}/`, {is_payment_done: true, payment_id: payId}, token)
-                .then((data) => {
-                  toast.success("Operation was successful!", {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                  });
-                  
-                //   navigate("/user/home");
-                })
-                .catch((error) => {
-                  if (error.response && error.response.status === 400) {
-                    console.error("API error: Invalid Creedentials");
-                    toast.error("Error", {
-                      position: "top-right",
-                      autoClose: 5000,
-                      hideProgressBar: false,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      theme: "light",
-                    });
-                  } else {
-                    console.error("API error:", error);
-                  }
-                });
-            }
-          },
-        theme: { color: "#ff9800" },
-      };
-      let razorPay = window.Razorpay(options);
-      razorPay.open();
-    };
+  const [textToCopy, setTextToCopy] = useState("Text to be copied");
+  const [copySuccess, setCopySuccess] = useState(false);
 
-
-
-    function Success() {
-      return (
-        <div>
-          <div className="flex flex-col justify-center items-center gap-3">
-            <p className="text-6xl">
-              <CheckCircleOutlineIcon
-                fontSize="inherit"
-                className="text-green-400"
-              />
-            </p>
-            <p className="font-poppins text-xl">Payment Succesfully</p>
-            <p>Payment ID: {paymentId}</p>
-            <p className="font-poppins text-sm text-gray-600">
-              Now you can add players to the tournament
-            </p>
-          </div>
-        </div>
-      );
+  const handleCopyClick = async () => {
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopySuccess(true);
+    } catch (error) {
+      console.error('Error copying text:', error);
     }
+  };
 
-    return (
+  const options = [
+    {
+        value: "Organizer",
+        label: "Organizer"
+    },
+    {
+        value: "Umpire",
+        label: "Umpire"
+    },
+    {
+        value: "Referee",
+        label: "Referee"
+    }
+  ]
 
-      <div className="w-full flex flex-col justify-center items-center gap-4 bg-white shadow-md rounded-lg py-5 px-4">
-        <div className="w-full">
-          <CustomizedSteppers step={3}/>
+  const [idName, setIdName] = useState();
+  const navigate = useNavigate();
+  let { id } = useParams();
+
+
+  return (
+    <div className="w-full py-5 px-4 bg-white shadow-md rounded-lg  gap-4 ">
+
+      <div className="w-full ">
+        <CustomizedSteppers step={3} />
+      </div>
+
+      <div className='gap-4  mt-4 flex flex-col'>
+        <p className='text-2xl lg:text-2xl font-bold text-blue-gray-700'>Add Collaborators</p>
+      
+
+      <div className='w-full flex flex-col lg:flex-row gap-4 justify-between items-center '>
+        <div className='w-full lg:w-1/2'>
+          <Input
+          value={idName}
+          onChange={(e) => setIdName(e.target.value)}
+          label="Enter username / email"
+          className=""
+          color="orange"
+          name="compName"
+          />
         </div>
-      {
-        confirmPayment ? (
-
-          <>
-        <Success />
-        <div className="w-full flex flex-row  items-center justify-center pt-10 gap-4">
-        <div className="text-xl w-full flex items-end justify-center">
-            <Button  size="lg" color="orange">Download Receipt</Button>
-          </div> 
+        <div className="w-full lg:w-1/4">
+            <Select
+            placeholder="Select role"
+            onChange={()=> {}}
+            options={options}
+            name="game"
+            />
+        </div>
+        <div className=''>
+          <Button 
+            onClick={()=> {}}
+            color='orange'
+            >Send Invite
+          </Button>
+        </div>
+      </div>
+      <div className="w-full">
+          <Select
+          placeholder="View invite list"
+          onChange={()=> {}}
+          options={options}
+          name="game"
+          />
+      </div>
+      </div>
+      <div className='w-full flex flex-col lg:flex-row gap-4 mt-4 '>
+      
+        <div className='w-full lg:w-1/2 lg:border-r-2 p-4 items-center justify-center  space-y-4'>
+          <div>
+            <p className='text-blue-gray-700 text-xl font-semibold text-center '>Share code / Invite Link</p>
           </div>
-        </>
-        ):
-        (
-          <>
-                <section className="text-gray-600 body-font overflow-hidden">
-  <div className="container px-5 mx-auto border border-gray-300 rounded-lg py-14 my-4">
-    <div className="flex flex-col text-center w-full  ">
-      <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">Pricing</h1>
-      <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-gray-500">Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical.</p>
-    </div>
-    <div className="">
-      <div className="p-4 w-full">
-        <div className="h-full p-6 rounded-lg  flex flex-col relative overflow-hidden">
-          <h2 className="text-sm tracking-widest title-font mb-1 font-medium">START</h2>
-          <h1 className="text-5xl text-gray-900 pb-4 mb-4 border-b border-gray-200 leading-none">Free</h1>
-          <p className="flex items-center text-gray-600 mb-2">
-            <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
-              <svg fill="none" stroke="currentColor"  className="w-3 h-3" viewBox="0 0 24 24">
-                <path d="M20 6L9 17l-5-5"></path>
-              </svg>
-            </span>Vexillologist pitchfork
-          </p>
-          <p className="flex items-center text-gray-600 mb-2">
-            <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
-              <svg fill="none" stroke="currentColor"  className="w-3 h-3" viewBox="0 0 24 24">
-                <path d="M20 6L9 17l-5-5"></path>
-              </svg>
-            </span>Tumeric plaid portland
-          </p>
-          <p className="flex items-center text-gray-600 mb-6">
-            <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
-              <svg fill="none" stroke="currentColor"  className="w-3 h-3" viewBox="0 0 24 24">
-                <path d="M20 6L9 17l-5-5"></path>
-              </svg>
-            </span>Mixtape chillwave tumeric
-          </p>
-          <button
-          onClick={launchRazorPay}
-           className="flex items-center mt-auto text-white bg-orange-500 border-0 py-2 px-4 w-full focus:outline-none hover:bg-gray-500 rounded">
-            Procced To pay
-            <svg fill="none" stroke="currentColor" className="w-4 h-4 ml-auto text-white" viewBox="0 0 24 24">
-              <path d="M5 12h14M12 5l7 7-7 7"></path>
-            </svg>
-          </button>
-          <p className="text-xs text-gray-500 mt-3">Literally you probably havent heard of them jean shorts.</p>
+          <div className='w-full flex items-center justify-center '>
+            {textToCopy && <QRCode value={textToCopy} />}
+          </div>
+        </div>
+
+        <div className='w-full lg:w-1/2 p-4 space-y-4'>
+          <div className='border-2 flex justify-between lg:px-8 py-2  rounded-xl'>
+            <p className='text-blue-gray-700 text-sm lg:text-xl font-semibold'>Enable / disable code</p>
+            
+            <Switch
+              id="custom-switch-component"
+              ripple={false}
+              className="h-full w-full checked:bg-[#ff9800]"
+              containerProps={{
+                className: "w-11 h-6",
+              }}
+              circleProps={{
+                className: "before:hidden left-0.5 border-none",
+              }}
+              onChange={()=>{
+                // enable disable function of code
+              }}
+            />
+          </div>
+          <div className='space-y-4'>
+              <p className='text-blue-gray-700 text-sm lg:text-xl font-semibold'>Share this link :</p>
+              <div className='flex flex-col sm:flex-row gap-4  items-center'>
+                <Input disabled 
+                  value={textToCopy}
+                  className="w-2/5"
+                />
+                <button
+              onClick={handleCopyClick} 
+              className='w-24 h-12  px-4 transition-all' 
+            >{copySuccess ? 
+              <img
+              className="h-10 w-10  object-cover object-center p-1"
+              src={check}
+              alt="Copied"
+            /> : 
+            <img
+            className="h-10 w-10 object-cover object-center p-2 rounded-lg bg-gray-100"
+            src={copy}
+            alt="copy"
+            onClick={()=>{}}
+          />
+          }</button>
+              </div>
+
+          
+          </div>
+        </div>
+
+      </div>
+      <div className='w-full p-2 flex flex-row items-center justify-center gap-4 border-y mt-4'>
+        <div className='item-center flex flex-col items-center justify-center '>
+            <img
+            className="h-10 w-10 rounded-full object-cover object-center border cursor-pointer"
+            src="https://cdn-icons-png.flaticon.com/128/10449/10449817.png"
+            alt="Embed"
+            onClick={()=>{}}
+            
+            />
+          <p className='hidden lg:block text-blue-gray-700'>Embed</p>
+        </div>
+        <div className='item-center flex flex-col items-center justify-center '>
+          <img
+            className="h-10 w-10 rounded-full object-cover object-center  cursor-pointer"
+            src="https://cdn-icons-png.flaticon.com/128/4494/4494494.png"
+            alt="Whatsapp"
+            onClick={()=>{}}
+          />
+          <p className='hidden lg:block text-blue-gray-700'>Whatsapp</p>  
+        </div>
+        <div className='item-center flex flex-col items-center justify-center  cursor-pointer'>
+          <img
+            className="h-10 w-10 rounded-full object-cover object-center"
+            src="https://cdn-icons-png.flaticon.com/128/3670/3670032.png"
+            alt="Facebook"
+            onClick={()=>{}}
+          />
+          <p className='hidden lg:block text-blue-gray-700'>Facebook</p>
+        </div>
+        <div className='item-center flex flex-col items-center justify-center  cursor-pointer'>
+          <img
+            className="h-10 w-10 rounded-full object-cover object-center"
+            src="https://cdn-icons-png.flaticon.com/128/3670/3670211.png"
+            alt="Twitter"
+            onClick={()=>{}}
+          />
+          <p className=' hidden lg:block text-blue-gray-700'>Twitter</p>
+        </div>
+        <div className='item-center flex flex-col items-center justify-center cursor-pointer'>
+          <img
+            className="h-10 w-10 rounded-full object-cover object-center"
+            src="https://cdn-icons-png.flaticon.com/128/552/552486.png"
+            alt="Email"
+            onClick={()=>{}}
+          />
+          <p className='hidden lg:block text-blue-gray-700'>Email</p>
         </div>
       </div>
 
-
-    </div>
-  </div>
-</section>
-          </>
-        )
-      }
-      
-      
-
-      <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4 ">
+      <div className="w-full flex flex-row  items-center justify-between lg:justify-between gap-4  mt-28">
         <Button color='orange' onClick={()=> navigate(`/organizer/new-tournament/step3/${id}`)} >
           Prev
         </Button>
@@ -205,9 +213,8 @@ const Step4 = () => {
         </Button>
       </div>
 
-      
-      </div>
-    );
-}
+    </div>
+  );
+};
 
-export default Step4
+export default Step4;

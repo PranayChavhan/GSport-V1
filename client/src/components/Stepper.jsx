@@ -166,7 +166,7 @@ ColorlibStepIcon.propTypes = {
   
 };
 
-const steps = ['Organization Details', 'Collaborators', 'Game Details', 'Payment', 'Participant Invite Code'];
+const steps = ['Organization Details','Payment',  'Game Details', 'Collaborators',  'Participant Invite Code'];
 
 export default function CustomizedSteppers({step}) {
   return (

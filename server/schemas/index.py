@@ -58,11 +58,17 @@ class Tournament(BaseModel):
 class Commentry(BaseModel):
     comment: str
     
+    
+class Sports_contest(BaseModel):
+    name: str
+    
+class match(BaseModel):
+    match_details: str
+    sports_contest_id: str
 class Tournament_Games(BaseModel):
     name: str
     info: str = None
     tournament_id :str
-    game_id: int
     participation_fees: int
     prize_pool: int
     max_teams: int

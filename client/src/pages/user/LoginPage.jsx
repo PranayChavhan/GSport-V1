@@ -176,9 +176,12 @@ const LoginPage = () => {
 
 
   }
+
+
+  const loginUrl = "/users/login?phone_no=%2B91${mobileNumber}&otp=${combinedDigits}"
   const handleVerify = (e)=>{
     e.preventDefault();
-    postRequestNoToken(`/users/login?phone_no=%2B91${mobileNumber}&otp=${combinedDigits}`)
+    postRequestNoToken(`/users/login/fake?phone_no=%2B91${mobileNumber}`)
         .then((data) => {
           console.log("API response:", data);
           const decoded = jwt(data.access_token);

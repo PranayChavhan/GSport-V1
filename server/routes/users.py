@@ -104,6 +104,18 @@ async def user_login(phone_no:str, otp: str, db: Session=Depends(get_db)):
 
 
 
+@userRouter.post('/login/fake')
+async def user_login(phone_no:str, db: Session=Depends(get_db)):
+    user = db.query(USERS).filter(USERS.phone_no == phone_no).first()
+    return {
+        'status': 'success',
+        'message': 'login successfully',
+        'data': user,
+        'access_token': create_access_token(user.id)
+    }
+
+
+
 @userRouter.get('/')
 async def fetch_all_users(db: Session = Depends(get_db)):
     return  db.query(USERS).all()
